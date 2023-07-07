@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'moodtracker.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  static const String _title = 'Flutter Stateful Clicker Counter';
+  static const String _title = 'CBT Selfcare';
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -31,15 +32,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  void _loadMoodTracker() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MoodTracker()),
+    );
   }
 
   @override
@@ -54,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text('Flutter Demo Click Counter'),
+        title: Text('CBT Selfcare'),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -75,18 +72,17 @@ class _MyHomePageState extends State<MyHomePage> {
               'You have pushed the button this many times:',
             ),
             Text(
-              '$_counter',
+              'Bro',
               style: TextStyle(fontSize: 25),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _loadMoodTracker,
         tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: Icon(Icons.chat_bubble),
       ),
     );
   }
 }
-
