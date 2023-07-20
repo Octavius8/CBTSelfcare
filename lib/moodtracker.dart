@@ -95,6 +95,16 @@ class MoodTrackerState extends State<MoodTracker> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        elevation: 0,
+        bottomOpacity: 0.0,
+        backgroundColor: Colors.grey[100],
+        foregroundColor: Colors.black38,
+        centerTitle: true,
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: Text('CBT Selfcare'),
+      ),
       body: Chat(
         messages: _messages,
         /*onAttachmentPressed: _handleAttachmentPressed,

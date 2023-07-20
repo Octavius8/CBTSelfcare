@@ -19,7 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_chat_ui: ^1.5.8
+  flutter_chat_ui: ^1.4.0
   mime: ^1.0.3
   path_provider: ^2.0.13
   uuid: ^3.0.7
