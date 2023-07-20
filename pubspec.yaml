@@ -24,6 +24,7 @@ dependencies:
   path_provider: ^2.0.13
   uuid: ^3.0.7
   sqflite: ^2.0.3
+  just_the_tooltip: ^0.0.12
 
 dev_dependencies:
   flutter_test:
