@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'moodtracker.dart';
 import 'config/theme_info.dart';
+import 'models/sqlite_database.dart';
+import 'dart:developer';
 
 void main() => runApp(MyApp());
 
@@ -40,6 +42,15 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void _dbtest() async {
+    log("Starting...");
+    SqliteDatabase db = new SqliteDatabase();
+    await db.connect();
+    await db.serverSync();
+    _counter = await db.count();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,23 +84,42 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Padding(
                   padding: EdgeInsets.all(ThemeInfo.size_card_padding),
                   child: Card(
-                      elevation: 1,
-                      clipBehavior: Clip.hardEdge,
-                      child: Center(
-                          child: Text("Start Here",
-                              textAlign: TextAlign.center))))),
+                      child: Padding(
+                          padding: EdgeInsets.all(ThemeInfo.size_card_padding),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("My Tasks:",
+                                    style: TextStyle(
+                                      fontSize: ThemeInfo.font_title_size,
+                                      // fontWeight: FontWeight.bold
+                                    ))
+                              ]))))),
 
           //Toolkit
           Padding(
-              padding: EdgeInsets.all(ThemeInfo.size_card_padding),
-              child: Row(
-                children: [
-                  ToolkitIcon(
-                      icon: Icons.edit_calendar,
-                      title: "Mood\nTracker",
-                      onTap: _loadMoodTracker)
-                ],
-              ))
+              padding: EdgeInsets.only(
+                  left: ThemeInfo.size_card_padding,
+                  right: ThemeInfo.size_card_padding,
+                  top: ThemeInfo.size_card_inter_padding),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Toolkit",
+                        style: TextStyle(fontSize: ThemeInfo.font_title_size)),
+                    Row(
+                      children: [
+                        ToolkitIcon(
+                            icon: Icons.edit_calendar,
+                            title: "Mood\nTracker",
+                            onTap: _loadMoodTracker),
+                        ToolkitIcon(
+                            icon: Icons.clean_hands,
+                            title: _counter.toString(),
+                            onTap: _dbtest)
+                      ],
+                    )
+                  ]))
         ])
       ]),
       /*floatingActionButton: FloatingActionButton(
