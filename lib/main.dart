@@ -10,6 +10,7 @@ import 'models/sqlite_database.dart';
 import 'dart:developer';
 import 'dart:math';
 import 'utils/logger.dart';
+import 'video_player.dart';
 
 void main() => runApp(MyApp());
 
@@ -69,6 +70,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void _loadVideoPlayer() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => VideoApp()),
+    );
+  }
+
   void _getMentalHealthData() async {
     print("Starting...");
     MentalHygiene mh = new MentalHygiene();
@@ -89,9 +97,16 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: ThemeInfo.color_secondary,
         foregroundColor: ThemeInfo.color_text_default,
         centerTitle: true,
+        title: Row(children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Image.asset('assets/logo_alt.png', height: 24),
+          ),
+          Text("CBT Selfcare", style: TextStyle(color: ThemeInfo.color_primary))
+        ]),
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text('CBT Selfcare'),
+        //title: Text('CBT Selfcare'),
       ),
       body: Column(children: [
         Container(
@@ -141,9 +156,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                     Text(
                                       ("Video:"),
                                     ),
-                                    Text((" Getting Started"),
-                                        style: TextStyle(
-                                            color: ThemeInfo.color_accent)),
+                                    InkWell(
+                                      onTap: _loadVideoPlayer,
+                                      child: Text((" Getting Started"),
+                                          style: TextStyle(
+                                              color: ThemeInfo.color_accent)),
+                                    ),
                                   ]),
                                 ),
 
