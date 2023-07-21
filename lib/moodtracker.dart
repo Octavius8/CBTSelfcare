@@ -103,7 +103,7 @@ class MoodTrackerState extends State<MoodTracker> {
         centerTitle: true,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text('CBT Selfcare'),
+        title: Text('Mood Tracker'),
       ),
       body: Chat(
         messages: _messages,

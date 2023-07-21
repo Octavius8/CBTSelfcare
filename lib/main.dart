@@ -2,12 +2,14 @@ import 'dart:ffi';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:flutter/material.dart';
 import 'moodtracker.dart';
+import 'mental_hygiene_page.dart';
 import 'models/mental_hygiene.dart';
 import 'models/prompt.dart';
 import 'config/theme_info.dart';
 import 'models/sqlite_database.dart';
 import 'dart:developer';
 import 'dart:math';
+import 'utils/logger.dart';
 
 void main() => runApp(MyApp());
 
@@ -21,6 +23,10 @@ class MyApp extends StatelessWidget {
       title: _title,
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        textTheme: Theme.of(context).textTheme.apply(
+              bodyColor: ThemeInfo.color_text_default, //<-- SEE HERE
+              displayColor: ThemeInfo.color_text_default, //<-- SEE HERE
+            ),
       ),
       home: MyHomePage(),
     );
@@ -40,7 +46,14 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   List<Prompt> mental_health_prompts = [];
-  String randomMentalHygienePrompt = "";
+  Prompt? randomMentalHygienePrompt;
+  int randomNumber = 0;
+
+  initState() {
+    // ignore: avoid_print
+    Log.debug("MyHomePage | initState()", "Starting initState...");
+    _getMentalHealthData();
+  }
 
   void _loadMoodTracker() {
     Navigator.push(
@@ -49,13 +62,21 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _dbtest() async {
+  void _loadMentalHygienePage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MentalHygienePage()),
+    );
+  }
+
+  void _getMentalHealthData() async {
     print("Starting...");
     MentalHygiene mh = new MentalHygiene();
     mental_health_prompts = await mh.getList();
     _counter = mental_health_prompts.length;
-    randomMentalHygienePrompt = mental_health_prompts[_counter - 1].name;
-    print("Count is : " + _counter.toString());
+    Random random = new Random();
+    int randomNumber = random.nextInt(_counter);
+    randomMentalHygienePrompt = mental_health_prompts[randomNumber];
     setState(() {});
   }
 
@@ -65,8 +86,8 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         elevation: 0,
         bottomOpacity: 0.0,
-        backgroundColor: Colors.grey[100],
-        foregroundColor: Colors.black38,
+        backgroundColor: ThemeInfo.color_secondary,
+        foregroundColor: ThemeInfo.color_text_default,
         centerTitle: true,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
@@ -76,9 +97,9 @@ class _MyHomePageState extends State<MyHomePage> {
         Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: ThemeInfo.color_secondary,
                 border: Border.all(
-                  color: Colors.grey[100]!,
+                  color: ThemeInfo.color_secondary,
                 ),
                 borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(20),
@@ -97,15 +118,113 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("My Tasks:",
-                                    style: TextStyle(
-                                      fontSize: ThemeInfo.font_title_size,
-                                      // fontWeight: FontWeight.bold
-                                    )),
-                                JustTheTooltip(
-                                    child:
-                                        Text("- ${randomMentalHygienePrompt}"),
-                                    content: Text("The details.")),
+                                //My Tasks
+                                Padding(
+                                    padding: EdgeInsets.only(bottom: 20),
+                                    child: Text("My Tasks:",
+                                        style: TextStyle(
+                                          fontSize: ThemeInfo.font_title_size,
+                                          // fontWeight: FontWeight.bold
+                                        ))),
+
+                                // Videos
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: Row(children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 16, right: 16),
+                                      child: Icon(Icons.video_library,
+                                          size: ThemeInfo.size_icon_small,
+                                          color: ThemeInfo.color_primary),
+                                    ),
+                                    Text(
+                                      ("Video:"),
+                                    ),
+                                    Text((" Getting Started"),
+                                        style: TextStyle(
+                                            color: ThemeInfo.color_accent)),
+                                  ]),
+                                ),
+
+                                // Trackers
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: Row(children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 16, right: 16),
+                                      child: Icon(Icons.edit_calendar,
+                                          size: ThemeInfo.size_icon_small,
+                                          color: ThemeInfo.color_primary),
+                                    ),
+                                    Text(
+                                      ("Tracker:"),
+                                    ),
+                                    InkWell(
+                                        child: Text(
+                                          ("  Mood Tracker"),
+                                          style: TextStyle(
+                                              color: ThemeInfo.color_accent),
+                                        ),
+                                        onTap: _loadMoodTracker),
+                                  ]),
+                                ),
+
+                                //Mental Hygiene
+                                Wrap(children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 16, right: 16),
+                                    child: Icon(Icons.clean_hands,
+                                        size: ThemeInfo.size_icon_small,
+                                        color: ThemeInfo.color_primary),
+                                  ),
+                                  InkWell(
+                                      onTap: () => showDialog<String>(
+                                            context: context,
+                                            builder: (BuildContext context) =>
+                                                AlertDialog(
+                                              title: Text(
+                                                  (randomMentalHygienePrompt
+                                                          ?.name ??
+                                                      "")),
+                                              content: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Icon(Icons.clean_hands,
+                                                        color: ThemeInfo
+                                                            .color_primary),
+                                                    Text(
+                                                      (randomMentalHygienePrompt
+                                                              ?.description ??
+                                                          ""),
+                                                    )
+                                                  ]),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                          context, 'OK'),
+                                                  child: const Text('OK'),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                      child: Text(
+                                          (randomMentalHygienePrompt?.name ??
+                                              ""),
+                                          style: TextStyle(
+                                              color: ThemeInfo.color_accent))),
+                                  Padding(
+                                      padding: EdgeInsets.only(left: 16),
+                                      child: InkWell(
+                                          child: Icon(Icons.refresh,
+                                              size: 16,
+                                              color: ThemeInfo.color_primary),
+                                          onTap: _getMentalHealthData)),
+                                ]),
                               ]))))),
 
           //Toolkit
@@ -120,6 +239,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Text("Toolkit",
                         style: TextStyle(fontSize: ThemeInfo.font_title_size)),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ToolkitIcon(
                             icon: Icons.edit_calendar,
@@ -127,10 +247,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             onTap: _loadMoodTracker),
                         ToolkitIcon(
                             icon: Icons.clean_hands,
-                            title: _counter.toString(),
-                            onTap: () {
-                              _dbtest();
-                            })
+                            title: "Mental\nHygiene",
+                            onTap: _loadMentalHygienePage)
                       ],
                     )
                   ]))
@@ -141,6 +259,31 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Increment',
         child: Icon(Icons.chat_bubble),
       ),*/
+      bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.area_chart),
+              label: 'Performance',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.video_library),
+              label: 'Videos',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+          currentIndex: 0,
+          selectedItemColor: ThemeInfo.color_accent,
+          unselectedItemColor: ThemeInfo.color_text_default,
+          onTap: (index) {
+            int a = 1;
+          }),
     );
   }
 }
@@ -162,7 +305,7 @@ class ToolkitIcon extends StatelessWidget {
                   Container(
                       clipBehavior: Clip.hardEdge,
                       decoration: BoxDecoration(
-                          color: ThemeInfo.primary_color,
+                          color: ThemeInfo.color_primary,
                           shape: BoxShape.circle),
                       child: Padding(
                           padding: EdgeInsets.all(12),
