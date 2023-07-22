@@ -1,2 +1,21 @@
 # Logo
 - bubble_chart icon as logo?
+
+["What is the situation?","What are you doing?"]
+
+
+List<String> _questions = [
+    "What's the situation?",
+    "Who is present?",
+    "What are you doing?",
+    "Where is it happening?",
+    "What dominant emotion are you feeling?",
+    "Rate how strong it is from 0-100",
+    "What are the unhelpful thoughts going through your mind?*", //Link to description
+    "What evidence is there in support of this thought?",
+    "What evidence is there against the unhelpful thought?",
+    "Whats a more balanced or alternative thought?",
+    "How much do you believe this alternative thought from 0-100?",
+    "How strong are your feelings now from 0-100?",
+    "Thank you for sharing. That is all for this session."
+  ];

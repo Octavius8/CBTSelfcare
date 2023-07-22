@@ -1,9 +1,10 @@
 import 'dart:ffi';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:flutter/material.dart';
-import 'moodtracker.dart';
+import 'conversation_page.dart';
 import 'mental_hygiene_page.dart';
 import 'models/mental_hygiene.dart';
+import 'models/lecture.dart';
 import 'models/prompt.dart';
 import 'config/theme_info.dart';
 import 'models/sqlite_database.dart';
@@ -48,18 +49,28 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   List<Prompt> mental_health_prompts = [];
   Prompt? randomMentalHygienePrompt;
+  Prompt? latest_lecture_prompt;
   int randomNumber = 0;
 
   initState() {
     // ignore: avoid_print
     Log.debug("MyHomePage | initState()", "Starting initState...");
+    _serverSync();
+  }
+
+  void _serverSync() async {
+    SqliteDatabase db = new SqliteDatabase();
+    await db.connect();
+    await db.serverSync();
+    await db.disconnect();
     _getMentalHealthData();
+    _getLatestLecture();
   }
 
   void _loadMoodTracker() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => MoodTracker()),
+      MaterialPageRoute(builder: (context) => ConversationPage(1)),
     );
   }
 
@@ -70,21 +81,29 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _loadVideoPlayer() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => VideoApp()),
-    );
+  void _loadVideoPlayer(Prompt? prompt) {
+    if (prompt != null)
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => VideoApp(prompt)),
+      );
   }
 
   void _getMentalHealthData() async {
-    print("Starting...");
+    Log.debug("MyHomePage | _getMentalHealthData", "Starting...");
     MentalHygiene mh = new MentalHygiene();
     mental_health_prompts = await mh.getList();
     _counter = mental_health_prompts.length;
     Random random = new Random();
     int randomNumber = random.nextInt(_counter);
     randomMentalHygienePrompt = mental_health_prompts[randomNumber];
+    setState(() {});
+  }
+
+  void _getLatestLecture() async {
+    Log.debug("MyHomePage | _getLatestLecture", "Starting...");
+    Lecture lecture = new Lecture();
+    latest_lecture_prompt = await lecture.getNextLecture();
     setState(() {});
   }
 
@@ -157,8 +176,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                       ("Video:"),
                                     ),
                                     InkWell(
-                                      onTap: _loadVideoPlayer,
-                                      child: Text((" Getting Started"),
+                                      onTap: () {
+                                        _loadVideoPlayer(latest_lecture_prompt);
+                                      },
+                                      child: Text(
+                                          (latest_lecture_prompt?.name ?? ""),
                                           style: TextStyle(
                                               color: ThemeInfo.color_accent)),
                                     ),

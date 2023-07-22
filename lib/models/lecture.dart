@@ -1,23 +1,25 @@
-import "sqlite_database.dart";
-import "prompt.dart";
-import "../utils/logger.dart";
+import 'prompt.dart';
+import '../utils/logger.dart';
+import 'sqlite_database.dart';
+import 'dart:async';
 
-class MentalHygiene {
-  Future<List<Prompt>> getList() async {
-    Log.debug(this.runtimeType.toString() + "|" + StackTrace.current.toString(),
-        "Starting...");
-    List<Prompt> finalList = [];
+class Lecture {
+  Future<Prompt?> getNextLecture() async {
+    String logPrefix = "Lecture | getNextLecture()";
+
+    Log.debug("Lecture | getNextLecture()", "Starting...");
     SqliteDatabase db = new SqliteDatabase();
     Log.debug(this.runtimeType.toString() + "|" + StackTrace.current.toString(),
         "Connecting to DB");
     await db.connect();
     Log.debug(this.runtimeType.toString() + "|" + StackTrace.current.toString(),
         "Selecting the data from the db");
-    List<Map> listmap =
-        await db.query("select * from prompt where category='MENTAL_HYGIENE';");
+    List<Map> listmap = await db.query(
+        "select * from prompt where category='LECTURE' and extra_data2='0' order by extra_data4 limit 1;");
 
+    Prompt? tempPrompt;
     listmap.forEach((element) {
-      Prompt tempPrompt = new Prompt(
+      tempPrompt = new Prompt(
           prompt_id: element["prompt_id"],
           category: element["category"],
           name: element["name"],
@@ -26,10 +28,10 @@ class MentalHygiene {
           extra_data2: element["extra_data2"] ?? "",
           extra_data3: element["extra_data3"] ?? "",
           extra_data4: element["extra_data4"] ?? "");
-      finalList.add(tempPrompt);
     });
     Log.debug(this.runtimeType.toString() + "|" + StackTrace.current.toString(),
-        "Returning final list:" + finalList.length.toString() + " Items");
-    return finalList;
+        "Returning latest lecture");
+
+    return tempPrompt;
   }
 }

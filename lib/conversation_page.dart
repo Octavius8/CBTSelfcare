@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'config/messages.dart';
+import 'models/conversation.dart';
+import 'models/prompt.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -11,32 +13,20 @@ import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
-class MoodTracker extends StatefulWidget {
+class ConversationPage extends StatefulWidget {
+  int prompt_id;
+  ConversationPage(this.prompt_id);
   @override
-  MoodTrackerState createState() => new MoodTrackerState();
+  ConversationPageState createState() => new ConversationPageState();
 }
 
-class MoodTrackerState extends State<MoodTracker> {
+class ConversationPageState extends State<ConversationPage> {
   Future<bool>? status;
   String user_message = "";
   int count = 0;
   List<types.Message> _messages = [];
   List<types.Message> _questionMessages = [];
-  List<String> _questions = [
-    "What's the situation?",
-    "Who is present?",
-    "What are you doing?",
-    "Where is it happening?",
-    "What dominant emotion are you feeling?",
-    "Rate how strong it is from 0-100",
-    "What are the unhelpful thoughts going through your mind?*", //Link to description
-    "What evidence is there in support of this thought?",
-    "What evidence is there against the unhelpful thought?",
-    "Whats a more balanced or alternative thought?",
-    "How much do you believe this alternative thought from 0-100?",
-    "How strong are your feelings now from 0-100?",
-    "Thank you for sharing. That is all for this session."
-  ];
+  List<String> _questions = [];
 
   final _user = const types.User(
     id: '82091008-a484-4a89-ae75-a22bf8d6f3ac',
@@ -79,13 +69,16 @@ class MoodTrackerState extends State<MoodTracker> {
     _addMessage(textMessage);
   }
 
-  void _loadMessages() {
+  void _loadMessages() async {
+    Conversation conversation = new Conversation();
+    await conversation.init(widget.prompt_id);
+    _questions = conversation.conversationList;
     //Initial Message
     final textMessage = types.TextMessage(
       author: _BotUser,
       createdAt: DateTime.now().millisecondsSinceEpoch,
       id: const Uuid().v4(),
-      text: Messages.CHAT_INITIAL_MESSAGE,
+      text: _questions[0],
     );
 
     _addMessage(textMessage);

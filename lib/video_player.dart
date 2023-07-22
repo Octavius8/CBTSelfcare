@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'config/theme_info.dart';
-
-void main() => runApp(const VideoApp());
+import 'models/lecture.dart';
+import 'models/prompt.dart';
 
 /// Stateful widget to fetch and then display video content.
 class VideoApp extends StatefulWidget {
-  const VideoApp({super.key});
+  Prompt prompt;
+  VideoApp(this.prompt, {super.key});
 
   @override
   _VideoAppState createState() => _VideoAppState();
@@ -14,14 +15,15 @@ class VideoApp extends StatefulWidget {
 
 class _VideoAppState extends State<VideoApp> {
   late VideoPlayerController _controller;
-  String title = "Title";
+  String title = "";
   String description = "What the what what is going on with the library";
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(
-        'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4')
+    this.title = widget.prompt.name;
+    this.description = widget.prompt.description;
+    _controller = VideoPlayerController.network(widget.prompt.extra_data1)
       ..initialize().then((_) {
         // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
         setState(() {});
@@ -35,6 +37,7 @@ class _VideoAppState extends State<VideoApp> {
       home: Scaffold(
         appBar: AppBar(
           elevation: 0,
+          leading: BackButton(),
           bottomOpacity: 0.0,
           backgroundColor: Colors.grey[100],
           foregroundColor: Colors.black38,
