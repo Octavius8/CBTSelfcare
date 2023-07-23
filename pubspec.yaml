@@ -26,6 +26,7 @@ dependencies:
   sqflite: ^2.0.3
   just_the_tooltip: ^0.0.12
   video_player: ^2.6.1
+  flutter_native_splash: ^2.2.9
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +53,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/logo_alt.png
+    - assets/logo_white.png
+    - assets/buymeacoffee.png
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

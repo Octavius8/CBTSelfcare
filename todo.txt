@@ -3,7 +3,6 @@
 
 ["What is the situation?","What are you doing?"]
 
-
 List<String> _questions = [
     "What's the situation?",
     "Who is present?",

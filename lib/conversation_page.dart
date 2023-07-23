@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'config/messages.dart';
 import 'models/conversation.dart';
 import 'models/prompt.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
@@ -96,7 +95,7 @@ class ConversationPageState extends State<ConversationPage> {
         centerTitle: true,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text('Mood Tracker'),
+        title: Text('Chat'),
       ),
       body: Chat(
         messages: _messages,

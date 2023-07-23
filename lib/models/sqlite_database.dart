@@ -1,6 +1,9 @@
 import 'package:sqflite/sqflite.dart';
 import '../config/database_configs.dart';
 import 'dart:async';
+import '../utils/api.dart';
+import 'dart:convert';
+import '../utils/logger.dart';
 
 class SqliteDatabase {
   late Database database;
@@ -45,23 +48,45 @@ class SqliteDatabase {
    * Parameters: 
    */
   Future<bool> serverSync() async {
-    // Insert some records in a transaction
+    // Prompt table update
+    Api api = new Api();
+    //Todo: Verify db version number first
+    String api_response = await api.postRequest(method: "getAllPrompts") ?? "";
+    if (api_response == "") {
+      Log.debug("SqliteDatabase | serverSync()",
+          "No data fetched. Ending server syncc");
+      return false;
+    }
+    Log.debug("SqliteDatabase | serverSync()",
+        "Data fetched. Proceeding to update db");
+
+    var json_response = jsonDecode(api_response);
+    List<dynamic> responseList = json_response["data"];
+    Log.debug("SqliteDatabase | serverSync",
+        "Response list: " + responseList.toString());
+
     await this.database.transaction((txn) async {
       await txn.rawDelete('DELETE FROM prompt');
-      int id0 = await txn.rawInsert(
-          'INSERT INTO prompt(category, name, description,extra_data1) VALUES("CONVERSATION", "Mood Tracker", "A conversation to monitor and correct unhelpful thoughts.",\'["Hi, the purpose of this chat is to give you a healthy place to rant while also acting as a mood tracker.","What is the situation?","What are you doing?"]\')');
+      responseList.forEach((prompt) async {
+        Log.debug("SqliteDatabase | serverSync()", "New entry being processed");
 
-      int id1 = await txn.rawInsert(
-          'INSERT INTO prompt(category, name, description,extra_data4) VALUES("MENTAL_HYGIENE", "Social Media Audit", "Go through your social media, and other feeds, and check to see if you are following people or pages that reinforce your draining thoughts and emotions.","1")');
-      int id2 = await txn.rawInsert(
-          'INSERT INTO prompt(category, name, description,extra_data4) VALUES("MENTAL_HYGIENE", "Clean Your Workspace", "The mind tends to take on the form of its environment. Now is a chance to clean out your workspace and arrange all your tools.","2")');
-      int id3 = await txn.rawInsert(
-          'INSERT INTO prompt(category, name, description,extra_data4) VALUES("MENTAL_HYGIENE", "Reach Out To Someone You Care About", "Maintaining your relationships is a great way to boost your mental health. Humans are social creatures by nature and by talking to someone you care about you what what what what.","3")');
-      int id4 = await txn.rawInsert(
-          'INSERT INTO prompt(category, name, description,extra_data1,extra_data2,extra_data3,extra_data4) VALUES("LECTURE", "Getting Started", "The mind tends to take on the form of its environment. Now is a chance to clean out your workspace and arrange all your tools.","https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4","0","","1")');
-      print('inserted1: $id1');
+        var row = {
+          'prompt_id': prompt["prompt_id"],
+          'category': prompt["category"],
+          'name': prompt["name"],
+          'description': prompt["description"],
+          'extra_data1': prompt["extra_data1"],
+          'extra_data2': prompt["extra_data2"],
+          'extra_data3': prompt['extra_data3'],
+          'extra_data4': prompt["extra_data4"],
+        };
+        await database.insert('prompt', row);
+      });
     });
 
+    int count = await this.count();
+    Log.debug(
+        "SqliteDatabase | serverSync()", "DB Count is:" + count.toString());
     return true;
   }
 
@@ -73,8 +98,7 @@ class SqliteDatabase {
   Future<int> count() async {
     // Count the records
     int count = Sqflite.firstIntValue(
-        await database.rawQuery('SELECT COUNT(*) FROM prompt'))!;
-    assert(count == 2);
+        await this.database.rawQuery('SELECT COUNT(*) FROM prompt'))!;
     return count;
   }
 }

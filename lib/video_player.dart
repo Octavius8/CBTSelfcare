@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-import 'config/theme_info.dart';
+import 'config/theme_configs.dart';
 import 'models/lecture.dart';
 import 'models/prompt.dart';
 
@@ -50,7 +50,7 @@ class _VideoAppState extends State<VideoApp> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(title,
-                style: TextStyle(fontSize: ThemeInfo.font_title_size)),
+                style: TextStyle(fontSize: ThemeConfigs.font_title_size)),
           ),
           _controller.value.isInitialized
               ? AspectRatio(
@@ -68,10 +68,10 @@ class _VideoAppState extends State<VideoApp> {
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Padding(
                 padding: const EdgeInsets.only(right: 16.0),
-                child: Icon(Icons.edit_note, color: ThemeInfo.color_accent),
+                child: Icon(Icons.edit_note, color: ThemeConfigs.color_accent),
               ),
               Text("Depression Form",
-                  style: TextStyle(color: ThemeInfo.color_accent)),
+                  style: TextStyle(color: ThemeConfigs.color_accent)),
             ]),
           ),
           Divider(height: 0),

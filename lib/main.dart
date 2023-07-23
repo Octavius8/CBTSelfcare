@@ -1,19 +1,39 @@
 import 'dart:ffi';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter/material.dart';
 import 'conversation_page.dart';
+import 'video_library_page .dart';
 import 'mental_hygiene_page.dart';
 import 'models/mental_hygiene.dart';
 import 'models/lecture.dart';
 import 'models/prompt.dart';
-import 'config/theme_info.dart';
+import 'config/theme_configs.dart';
 import 'models/sqlite_database.dart';
 import 'dart:developer';
 import 'dart:math';
 import 'utils/logger.dart';
 import 'video_player.dart';
+import 'utils/api.dart';
+import 'config/api_configs.dart';
+import 'dart:io';
 
-void main() => runApp(MyApp());
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
+void main() {
+  HttpOverrides.global = MyHttpOverrides();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -26,8 +46,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         textTheme: Theme.of(context).textTheme.apply(
-              bodyColor: ThemeInfo.color_text_default, //<-- SEE HERE
-              displayColor: ThemeInfo.color_text_default, //<-- SEE HERE
+              bodyColor: ThemeConfigs.color_text_default, //<-- SEE HERE
+              displayColor: ThemeConfigs.color_text_default, //<-- SEE HERE
             ),
       ),
       home: MyHomePage(),
@@ -50,21 +70,46 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Prompt> mental_health_prompts = [];
   Prompt? randomMentalHygienePrompt;
   Prompt? latest_lecture_prompt;
+  bool adsEnabled = false;
   int randomNumber = 0;
 
   initState() {
     // ignore: avoid_print
     Log.debug("MyHomePage | initState()", "Starting initState...");
-    _serverSync();
+
+    initialization();
   }
 
-  void _serverSync() async {
+  void initialization() async {
+    // This is where you can initialize the resources needed by your app while
+    // the splash screen is displayed.  Remove the following example because
+    // delaying the user experience is a bad design practice!
+    // ignore_for_file: avoid_print
+    await _serverSync();
+    /*print('ready in 3...');
+    await Future.delayed(const Duration(seconds: 1));
+    print('ready in 2...');
+    await Future.delayed(const Duration(seconds: 1));
+    print('ready in 1...');
+    await Future.delayed(const Duration(seconds: 1));
+    print('go!');*/
+    FlutterNativeSplash.remove();
+  }
+
+  Future<bool> _serverSync() async {
     SqliteDatabase db = new SqliteDatabase();
     await db.connect();
     await db.serverSync();
     await db.disconnect();
     _getMentalHealthData();
     _getLatestLecture();
+    return true;
+  }
+
+  Future<void> _launchUrl(String url) async {
+    if (!await launchUrl(Uri.parse(url))) {
+      throw Exception('Could not launch $url');
+    }
   }
 
   void _loadMoodTracker() {
@@ -87,6 +132,11 @@ class _MyHomePageState extends State<MyHomePage> {
         context,
         MaterialPageRoute(builder: (context) => VideoApp(prompt)),
       );
+  }
+
+  void _loadVideoLibrary() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => VideoLibraryPage()));
   }
 
   void _getMentalHealthData() async {
@@ -113,194 +163,312 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         elevation: 0,
         bottomOpacity: 0.0,
-        backgroundColor: ThemeInfo.color_secondary,
-        foregroundColor: ThemeInfo.color_text_default,
+        backgroundColor: ThemeConfigs.color_secondary,
+        foregroundColor: ThemeConfigs.color_text_default,
         centerTitle: true,
         title: Row(children: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: Image.asset('assets/logo_alt.png', height: 24),
           ),
-          Text("CBT Selfcare", style: TextStyle(color: ThemeInfo.color_primary))
+          Text("CBT Selfcare",
+              style: TextStyle(color: ThemeConfigs.color_primary))
         ]),
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         //title: Text('CBT Selfcare'),
       ),
-      body: Column(children: [
-        Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-                color: ThemeInfo.color_secondary,
-                border: Border.all(
-                  color: ThemeInfo.color_secondary,
-                ),
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20))),
-            margin: EdgeInsets.only(bottom: 24),
-            width: MediaQuery.of(context).size.width,
-            child: Center(child: Text("Welcome to Selfcare"))),
-        Column(children: [
-          SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Padding(
-                  padding: EdgeInsets.all(ThemeInfo.size_card_padding),
-                  child: Card(
-                      child: Padding(
-                          padding: EdgeInsets.all(ThemeInfo.size_card_padding),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                //My Tasks
-                                Padding(
-                                    padding: EdgeInsets.only(bottom: 20),
-                                    child: Text("My Tasks:",
-                                        style: TextStyle(
-                                          fontSize: ThemeInfo.font_title_size,
-                                          // fontWeight: FontWeight.bold
-                                        ))),
-
-                                // Videos
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 8.0),
-                                  child: Row(children: [
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+              child: Column(children: [
+            Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    color: ThemeConfigs.color_secondary,
+                    border: Border.all(
+                      color: ThemeConfigs.color_secondary,
+                    ),
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(20))),
+                margin: EdgeInsets.only(bottom: 24),
+                width: MediaQuery.of(context).size.width,
+                child: Center(child: Text("Welcome to Selfcare"))),
+            Column(children: [
+              SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: Padding(
+                      padding: EdgeInsets.all(ThemeConfigs.size_card_padding),
+                      child: Card(
+                          child: Padding(
+                              padding: EdgeInsets.all(
+                                  ThemeConfigs.size_card_padding),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    //My Tasks
                                     Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 16, right: 16),
-                                      child: Icon(Icons.video_library,
-                                          size: ThemeInfo.size_icon_small,
-                                          color: ThemeInfo.color_primary),
-                                    ),
-                                    Text(
-                                      ("Video:"),
-                                    ),
-                                    InkWell(
-                                      onTap: () {
-                                        _loadVideoPlayer(latest_lecture_prompt);
-                                      },
-                                      child: Text(
-                                          (latest_lecture_prompt?.name ?? ""),
-                                          style: TextStyle(
-                                              color: ThemeInfo.color_accent)),
-                                    ),
-                                  ]),
-                                ),
+                                        padding: EdgeInsets.only(bottom: 20),
+                                        child: Text("My Tasks:",
+                                            style: TextStyle(
+                                              fontSize:
+                                                  ThemeConfigs.font_title_size,
+                                              // fontWeight: FontWeight.bold
+                                            ))),
 
-                                // Trackers
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 8.0),
-                                  child: Row(children: [
+                                    // Videos
                                     Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 16, right: 16),
-                                      child: Icon(Icons.edit_calendar,
-                                          size: ThemeInfo.size_icon_small,
-                                          color: ThemeInfo.color_primary),
-                                    ),
-                                    Text(
-                                      ("Tracker:"),
-                                    ),
-                                    InkWell(
-                                        child: Text(
-                                          ("  Mood Tracker"),
-                                          style: TextStyle(
-                                              color: ThemeInfo.color_accent),
+                                      padding:
+                                          const EdgeInsets.only(bottom: 8.0),
+                                      child: Row(children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Icon(Icons.video_library,
+                                              size:
+                                                  ThemeConfigs.size_icon_small,
+                                              color:
+                                                  ThemeConfigs.color_primary),
                                         ),
-                                        onTap: _loadMoodTracker),
-                                  ]),
-                                ),
+                                        Text(
+                                          ("Video:"),
+                                        ),
+                                        InkWell(
+                                          onTap: () {
+                                            _loadVideoPlayer(
+                                                latest_lecture_prompt);
+                                          },
+                                          child: Text(
+                                              (latest_lecture_prompt?.name ??
+                                                  ""),
+                                              style: TextStyle(
+                                                  color: ThemeConfigs
+                                                      .color_accent)),
+                                        ),
+                                      ]),
+                                    ),
 
-                                //Mental Hygiene
-                                Wrap(children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 16, right: 16),
-                                    child: Icon(Icons.clean_hands,
-                                        size: ThemeInfo.size_icon_small,
-                                        color: ThemeInfo.color_primary),
-                                  ),
-                                  InkWell(
-                                      onTap: () => showDialog<String>(
-                                            context: context,
-                                            builder: (BuildContext context) =>
-                                                AlertDialog(
-                                              title: Text(
-                                                  (randomMentalHygienePrompt
-                                                          ?.name ??
-                                                      "")),
-                                              content: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Icon(Icons.clean_hands,
-                                                        color: ThemeInfo
-                                                            .color_primary),
-                                                    Text(
-                                                      (randomMentalHygienePrompt
-                                                              ?.description ??
-                                                          ""),
-                                                    )
-                                                  ]),
-                                              actions: <Widget>[
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(
-                                                          context, 'OK'),
-                                                  child: const Text('OK'),
-                                                ),
-                                              ],
+                                    // Trackers
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 8.0),
+                                      child: Row(children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Icon(Icons.edit_calendar,
+                                              size:
+                                                  ThemeConfigs.size_icon_small,
+                                              color:
+                                                  ThemeConfigs.color_primary),
+                                        ),
+                                        Text(
+                                          ("Tracker:"),
+                                        ),
+                                        InkWell(
+                                            child: Text(
+                                              ("  Mood Tracker"),
+                                              style: TextStyle(
+                                                  color: ThemeConfigs
+                                                      .color_accent),
                                             ),
-                                          ),
-                                      child: Text(
-                                          (randomMentalHygienePrompt?.name ??
-                                              ""),
-                                          style: TextStyle(
-                                              color: ThemeInfo.color_accent))),
-                                  Padding(
-                                      padding: EdgeInsets.only(left: 16),
-                                      child: InkWell(
-                                          child: Icon(Icons.refresh,
-                                              size: 16,
-                                              color: ThemeInfo.color_primary),
-                                          onTap: _getMentalHealthData)),
-                                ]),
-                              ]))))),
+                                            onTap: _loadMoodTracker),
+                                      ]),
+                                    ),
 
-          //Toolkit
-          Padding(
-              padding: EdgeInsets.only(
-                  left: ThemeInfo.size_card_padding,
-                  right: ThemeInfo.size_card_padding,
-                  top: ThemeInfo.size_card_inter_padding),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Toolkit",
-                        style: TextStyle(fontSize: ThemeInfo.font_title_size)),
-                    Row(
+                                    //Mental Hygiene
+                                    Wrap(children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 16, right: 16),
+                                        child: Icon(Icons.clean_hands,
+                                            size: ThemeConfigs.size_icon_small,
+                                            color: ThemeConfigs.color_primary),
+                                      ),
+                                      InkWell(
+                                          onTap: () => showDialog<String>(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        AlertDialog(
+                                                  title: Text(
+                                                      (randomMentalHygienePrompt
+                                                              ?.name ??
+                                                          "")),
+                                                  content: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Icon(Icons.clean_hands,
+                                                            color: ThemeConfigs
+                                                                .color_primary),
+                                                        Text(
+                                                          (randomMentalHygienePrompt
+                                                                  ?.description ??
+                                                              ""),
+                                                        )
+                                                      ]),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                              context, 'OK'),
+                                                      child: const Text('OK'),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                          child: Text(
+                                              (randomMentalHygienePrompt
+                                                      ?.name ??
+                                                  ""),
+                                              style: TextStyle(
+                                                  color: ThemeConfigs
+                                                      .color_accent))),
+                                      Padding(
+                                          padding: EdgeInsets.only(left: 16),
+                                          child: InkWell(
+                                              child: Icon(Icons.refresh,
+                                                  size: 16,
+                                                  color: ThemeConfigs
+                                                      .color_primary),
+                                              onTap: _getMentalHealthData)),
+                                    ]),
+                                  ]))))),
+
+              //Notices
+              Padding(
+                  padding: EdgeInsets.only(
+                      left: ThemeConfigs.size_card_padding,
+                      right: ThemeConfigs.size_card_padding,
+                      bottom: ThemeConfigs.size_card_padding),
+                  child: Container(
+                      child: Card(
+                    color: Colors.blue,
+                    child: Container(
+                      height: 80,
+                    ),
+                  ))),
+
+              //Toolkit
+              Padding(
+                  padding: EdgeInsets.only(
+                      left: ThemeConfigs.size_card_padding,
+                      right: ThemeConfigs.size_card_padding,
+                      top: ThemeConfigs.size_card_inter_padding),
+                  child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ToolkitIcon(
-                            icon: Icons.edit_calendar,
-                            title: "Mood\nTracker",
-                            onTap: _loadMoodTracker),
-                        ToolkitIcon(
-                            icon: Icons.clean_hands,
-                            title: "Mental\nHygiene",
-                            onTap: _loadMentalHygienePage)
-                      ],
-                    )
-                  ]))
-        ])
-      ]),
+                        Text("Toolkit",
+                            style: TextStyle(
+                                fontSize: ThemeConfigs.font_title_size)),
+                        Wrap(
+                          //crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ToolkitIcon(
+                                icon: Icons.edit_calendar,
+                                title: "Mood\nTracker",
+                                onTap: _loadMoodTracker),
+                            ToolkitIcon(
+                                icon: Icons.clean_hands,
+                                title: "Mental\nHygiene",
+                                enabled: true,
+                                onTap: _loadMentalHygienePage),
+                            ToolkitIcon(
+                                icon: Icons.emoji_food_beverage,
+                                title: "Gratitude\nJournal",
+                                enabled: true,
+                                onTap: _loadMentalHygienePage),
+                            ToolkitIcon(
+                                icon: Icons.clean_hands,
+                                title: "Mental\nHygiene",
+                                enabled: false,
+                                onTap: _loadMentalHygienePage),
+                            ToolkitIcon(
+                                icon: Icons.clean_hands,
+                                title: "Mental\nHygiene",
+                                enabled: false,
+                                onTap: _loadMentalHygienePage),
+                            ToolkitIcon(
+                                icon: Icons.clean_hands,
+                                title: "Mental\nHygiene",
+                                enabled: false,
+                                onTap: _loadMentalHygienePage),
+                            ToolkitIcon(
+                                icon: Icons.clean_hands,
+                                title: "Mental\nHygiene",
+                                enabled: false,
+                                onTap: _loadMentalHygienePage),
+                            ToolkitIcon(
+                                icon: Icons.clean_hands,
+                                title: "Mental\nHygiene",
+                                enabled: false,
+                                onTap: _loadMentalHygienePage),
+                          ],
+                        )
+                      ]))
+            ]),
+          ])),
+
+          //Advert Container
+          AnimatedPositioned(
+              bottom: adsEnabled ? 0 : -50,
+              duration: Duration(milliseconds: 300),
+              child: Container(
+                  child: Center(
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                        Text("Buy me a coffee?",
+                            style: TextStyle(
+                                fontSize: ThemeConfigs.font_title_size)),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 16.0, left: 16),
+                          child: InkWell(
+                            onTap: () {
+                              _launchUrl(APIConfigs.bmc_url);
+                              adsEnabled = false;
+                              setState(() {});
+                            },
+                            child: Text("Yes",
+                                style: TextStyle(
+                                    color: ThemeConfigs.color_accent,
+                                    fontSize: ThemeConfigs.font_title_size)),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            adsEnabled = false;
+                            setState(() {});
+                          },
+                          child: Text("No",
+                              style: TextStyle(
+                                  fontSize: ThemeConfigs.font_title_size)),
+                        )
+                      ])),
+                  width: MediaQuery.of(context).size.width,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: Offset(0, 3), // changes position of shadow
+                      ),
+                    ],
+                  )))
+        ],
+      ),
       /*floatingActionButton: FloatingActionButton(
         onPressed: _loadMoodTracker,
         tooltip: 'Increment',
         child: Icon(Icons.chat_bubble),
       ),*/
       bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
+          items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Home',
@@ -314,15 +482,23 @@ class _MyHomePageState extends State<MyHomePage> {
               label: 'Videos',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: 'Settings',
+              icon: Image.asset("assets/buymeacoffee.png", height: 30),
+              label: 'Buy Me A Coffee',
             ),
           ],
           currentIndex: 0,
-          selectedItemColor: ThemeInfo.color_accent,
-          unselectedItemColor: ThemeInfo.color_text_default,
+          selectedItemColor: ThemeConfigs.color_accent,
+          unselectedItemColor: ThemeConfigs.color_text_default,
           onTap: (index) {
-            int a = 1;
+            switch (index) {
+              case 2:
+                _loadVideoLibrary();
+                break;
+              case 3:
+                adsEnabled = adsEnabled ? false : true;
+                setState(() {});
+                break;
+            }
           }),
     );
   }
@@ -332,7 +508,13 @@ class ToolkitIcon extends StatelessWidget {
   IconData icon;
   String title;
   VoidCallback onTap;
-  ToolkitIcon({required this.icon, required this.title, required this.onTap});
+  bool enabled;
+
+  ToolkitIcon(
+      {required this.icon,
+      required this.title,
+      required this.onTap,
+      this.enabled = true});
 
   Widget build(BuildContext context) {
     return Padding(
@@ -345,13 +527,15 @@ class ToolkitIcon extends StatelessWidget {
                   Container(
                       clipBehavior: Clip.hardEdge,
                       decoration: BoxDecoration(
-                          color: ThemeInfo.color_primary,
+                          color: ThemeConfigs.color_primary,
                           shape: BoxShape.circle),
                       child: Padding(
                           padding: EdgeInsets.all(12),
-                          child: Icon(icon, color: Colors.white))),
-                  Text(this.title, textAlign: TextAlign.center)
+                          child: enabled
+                              ? Icon(icon, color: Colors.white)
+                              : Icon(Icons.lock, color: Color(0xFF70c5d1)))),
+                  Text(enabled ? this.title : "", textAlign: TextAlign.center)
                 ]),
-            onTap: this.onTap));
+            onTap: enabled ? this.onTap : () {}));
   }
 }
