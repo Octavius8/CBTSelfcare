@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
               ),
         ),
         home: FlutterSplashScreen.fadeIn(
-          duration: Duration(seconds: 10),
+          duration: Duration(seconds: 4),
           backgroundColor: Colors.white,
           onInit: () {
             debugPrint("On Init");

@@ -11,6 +11,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
+import 'package:filesystem_picker/filesystem_picker.dart';
+import 'dart:io';
 
 class ConversationPage extends StatefulWidget {
   String conversation_tag;
@@ -26,6 +28,10 @@ class ConversationPageState extends State<ConversationPage> {
   List<types.Message> _messages = [];
   List<types.Message> _questionMessages = [];
   List<String> _questions = [];
+  List<String> _answers = [];
+  Directory? selectedDirectory;
+
+  late Conversation conversation;
 
   final _user = const types.User(
     id: '82091008-a484-4a89-ae75-a22bf8d6f3ac',
@@ -47,18 +53,25 @@ class ConversationPageState extends State<ConversationPage> {
     });
   }
 
-  void _handleSendPressed(types.PartialText message) {
+  void _handleSendPressed(types.PartialText message) async {
     var textMessage = types.TextMessage(
       author: _user,
       createdAt: DateTime.now().millisecondsSinceEpoch,
       id: const Uuid().v4(),
       text: message.text,
     );
-
+    _answers.add(message.text);
     _addMessage(textMessage);
 
     //bot feedback
     count++;
+
+    //Save if its the last prompt.
+    if (count == _questions.length - 1) {
+      await conversation.saveAnswers(_answers);
+    }
+
+    //End save.
     textMessage = types.TextMessage(
       author: _BotUser,
       createdAt: DateTime.now().millisecondsSinceEpoch,
@@ -73,7 +86,7 @@ class ConversationPageState extends State<ConversationPage> {
   }
 
   void _loadMessages() async {
-    Conversation conversation = new Conversation();
+    conversation = new Conversation();
     await conversation.init(widget.conversation_tag);
     _questions = conversation.conversationList;
 
@@ -111,6 +124,23 @@ class ConversationPageState extends State<ConversationPage> {
         bottomOpacity: 0.0,
         backgroundColor: Colors.grey[100],
         foregroundColor: Colors.black38,
+        actions: [
+          InkWell(
+              onTap: () async {
+                String path = await FilesystemPicker.open(
+                      title: 'Save to folder',
+                      context: context,
+                      rootDirectory: await getExternalStorageDirectory() ??
+                          await getTemporaryDirectory(),
+                      fsType: FilesystemType.folder,
+                      pickText: 'Save file to this folder',
+                    ) ??
+                    "";
+
+                conversation.extractAnswers(path);
+              },
+              child: Icon(Icons.file_download_outlined))
+        ],
         centerTitle: true,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.

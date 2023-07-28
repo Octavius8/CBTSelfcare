@@ -13,20 +13,24 @@ class SqliteDatabase {
    * Description: Establish connection to the database and initiate if necessary
    * Parameters: 
    */
-  Future<bool> connect() async {
+  Future<bool> connect({bool reset = false}) async {
     // Get a location using getDatabasesPath
     var databasesPath = await getDatabasesPath();
     String path = databasesPath + DatabaseConfigs.db_name;
 
     // Delete the database
-    //await deleteDatabase(path);
+    if (reset) await deleteDatabase(path);
 
     // open the database
     this.database = await openDatabase(path, version: 1,
         onCreate: (Database db, int version) async {
       // When creating the db, create the table
       await db.execute(
-          'CREATE TABLE prompt (prompt_id INTEGER PRIMARY KEY, category TEXT, name TEXT, description TEXT,extra_data1 TEXT, extra_data2 TEXT,extra_data3 TEXT, extra_data4 TEXT)');
+          'CREATE TABLE prompt (prompt_id INTEGER PRIMARY KEY, category TEXT, name TEXT,  version TEXT, description TEXT,extra_data1 TEXT, extra_data2 TEXT,extra_data3 TEXT, extra_data4 TEXT)');
+      await db.execute(
+          'CREATE TABLE prompt_answers (prompt_responses_id INTEGER PRIMARY KEY, prompt_id INTEGER,prompt_name TEXT, version_number TEXT, description TEXT,extra_data1 TEXT, extra_data2 TEXT,extra_data3 TEXT, extra_data4 TEXT,date_created DATETIME DEFAULT CURRENT_TIMESTAMP)');
+      await db.execute(
+          'CREATE TABLE config (prompt_id INTEGER PRIMARY KEY, config_name TEXT, config_value TEXT, date_created DATETIME DEFAULT CURRENT_TIMESTAMP)');
     });
 
     return true;
@@ -39,6 +43,7 @@ class SqliteDatabase {
    */
   Future<List<Map>> query(sql) async {
     List<Map> list = await database.rawQuery(sql);
+    Log.debug("SqliteDatabase | query", "Response is: " + jsonEncode(list));
     return list;
   }
 
