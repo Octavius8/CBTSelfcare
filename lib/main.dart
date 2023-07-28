@@ -1,7 +1,7 @@
 import 'dart:ffi';
-import 'package:just_the_tooltip/just_the_tooltip.dart';
+import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:pulse_widget/pulse_widget.dart';
 import 'package:flutter/material.dart';
 import 'conversation_page.dart';
 import 'video_library_page .dart';
@@ -17,7 +17,9 @@ import 'utils/logger.dart';
 import 'video_player.dart';
 import 'utils/api.dart';
 import 'config/api_configs.dart';
+import 'config/system_constants.dart';
 import 'dart:io';
+import 'dart:async';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -31,7 +33,6 @@ class MyHttpOverrides extends HttpOverrides {
 void main() {
   HttpOverrides.global = MyHttpOverrides();
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   runApp(MyApp());
 }
 
@@ -41,17 +42,36 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    double splashscreenOpacity = 0;
     return MaterialApp(
-      title: _title,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        textTheme: Theme.of(context).textTheme.apply(
-              bodyColor: ThemeConfigs.color_text_default, //<-- SEE HERE
-              displayColor: ThemeConfigs.color_text_default, //<-- SEE HERE
-            ),
-      ),
-      home: MyHomePage(),
-    );
+        title: _title,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          textTheme: Theme.of(context).textTheme.apply(
+                bodyColor: ThemeConfigs.color_text_default, //<-- SEE HERE
+                displayColor: ThemeConfigs.color_text_default, //<-- SEE HERE
+              ),
+        ),
+        home: FlutterSplashScreen.fadeIn(
+          duration: Duration(seconds: 10),
+          backgroundColor: Colors.white,
+          onInit: () {
+            debugPrint("On Init");
+          },
+          onEnd: () {
+            debugPrint("On End");
+          },
+          childWidget: SizedBox(
+            height: 200,
+            width: 200,
+            child: AnimatedOpacity(
+                duration: Duration(seconds: 5),
+                opacity: 1,
+                child: Image.asset("assets/logo_alt.png")),
+          ),
+          onAnimationEnd: () => debugPrint("On Fade In End"),
+          defaultNextScreen: const MyHomePage(),
+        ));
   }
 }
 
@@ -86,14 +106,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // delaying the user experience is a bad design practice!
     // ignore_for_file: avoid_print
     await _serverSync();
-    /*print('ready in 3...');
-    await Future.delayed(const Duration(seconds: 1));
-    print('ready in 2...');
-    await Future.delayed(const Duration(seconds: 1));
-    print('ready in 1...');
-    await Future.delayed(const Duration(seconds: 1));
-    print('go!');*/
-    FlutterNativeSplash.remove();
   }
 
   Future<bool> _serverSync() async {
@@ -112,10 +124,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _loadMoodTracker() {
+  void _loadConversation(conversation_tag) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ConversationPage(1)),
+      MaterialPageRoute(
+          builder: (context) => ConversationPage(conversation_tag)),
     );
   }
 
@@ -273,7 +286,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   color: ThemeConfigs
                                                       .color_accent),
                                             ),
-                                            onTap: _loadMoodTracker),
+                                            onTap: () {
+                                              _loadConversation(SystemConstants
+                                                  .conversation_tag_mood_tracker);
+                                            }),
                                       ]),
                                     ),
 
@@ -369,7 +385,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             ToolkitIcon(
                                 icon: Icons.edit_calendar,
                                 title: "Mood\nTracker",
-                                onTap: _loadMoodTracker),
+                                onTap: () {
+                                  _loadConversation(SystemConstants
+                                      .conversation_tag_mood_tracker);
+                                }),
                             ToolkitIcon(
                                 icon: Icons.clean_hands,
                                 title: "Mental\nHygiene",
@@ -379,7 +398,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 icon: Icons.emoji_food_beverage,
                                 title: "Gratitude\nJournal",
                                 enabled: true,
-                                onTap: _loadMentalHygienePage),
+                                onTap: () {
+                                  _loadConversation(SystemConstants
+                                      .conversation_tag_gratitude_journal);
+                                }),
                             ToolkitIcon(
                                 icon: Icons.clean_hands,
                                 title: "Mental\nHygiene",

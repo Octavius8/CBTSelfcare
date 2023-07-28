@@ -6,11 +6,11 @@ import 'dart:convert';
 class Conversation {
   List<String> conversationList = [];
   Prompt? prompt;
-  Future<Prompt?> init(int prompt_id) async {
+  Future<Prompt?> init(String conversation_tag) async {
     SqliteDatabase db = new SqliteDatabase();
     await db.connect();
-    var list =
-        await db.query("select * from prompt where prompt_id='$prompt_id'");
+    var list = await db
+        .query("select * from prompt where extra_data2='$conversation_tag'");
     Prompt? finalPrompt;
     list.forEach((element) {
       this.prompt = new Prompt(
@@ -26,6 +26,7 @@ class Conversation {
     Log.debug("Conversation | init",
         "extra data1 value is : " + (prompt?.extra_data1 ?? ""));
     List<dynamic> tempList = jsonDecode(prompt?.extra_data1 ?? "");
+    conversationList.add(prompt?.description ?? "");
     tempList.forEach((element) {
       conversationList.add(element.toString());
     });

@@ -18,3 +18,91 @@ List<String> _questions = [
     "How strong are your feelings now from 0-100?",
     "Thank you for sharing. That is all for this session."
   ];
+
+  "Write about a time when you laughed uncontrollably.",
+  "What aspect of your health do you feel grateful for?",
+  "Who is the most reliable person in your life?",
+  "What is the funniest video you've watched recently?",
+  "What is your favorite part about your town or city?",
+  "What is one part of your life that you won't trade for anything?",
+  "What is something that was hard to do but you did it anyway?",
+  "Write a thank-you note to yourself.",
+  "How have you supported people throughout your life? Remember a time when you helped someone in need.",
+  "Describe the last time someone helped you solve a problem at work or personal tasks."
+
+  "Write about a random act of kindness from another person.",
+  "Write down the name of a person you care about",
+  "What are some of the good qualities you like about them?",
+  "Write about something you accomplished today, and how you feel about it.",
+  "What is one thing you like about yourself?",
+  "Whats another thing you like about yourself?",
+  "What is one random thing you are grateful for?",
+  "Thank you for sharing. Have a great day :)"
+
+
+  # Lesson Plan
+  1. About this App | anxiety/depression form to establish baseline
+  2. What is CBT | Mental Hygiene List
+  3. Thoughts: Helpful and Unhelpful Thoughts and Core Beliefs | track behaviour mood and thoughts
+  4. Behaviours : Mental Hygiene list | Update mood tracker to include activities
+  5. Emotions : (Need to read) | Update Mood tracker again
+
+
+
+# Research
+
+  The purpose of this app is to teach you to manage and overcome your depression and anxiety by using the proven concepts of CBT. CBT Stands for Cognitive Behavioural Therapy, and is more concerned about producing tangible results in a fixed timeframe compared to other forms of therapy that are based on you understanding the causes of your behaviours and emotions.
+The app will require you to put aside some time periodically, ideally every day and engage in the tutorials and exercises to keep you focused on this journey. The bad news is this will require effort on your part, the good news is that these are proven methods and will yield results if you put in the work. 
+Time for your first lesson. Lets get started.
+- Emphasize importance of being committed to ones self
+- 
+
+
+
+Essential Components of CBT
+CBT contains several essential components that contribute to its effectiveness in therapy. These components are:
+
+Cognitive Restructuring: This component involves identifying and challenging negative or maladaptive thoughts and beliefs. By examining the evidence for and against these thoughts, individuals can replace them with more balanced and helpful alternatives.
+
+Behavioral Activation: Behavioral activation focuses on increasing engagement in activities that promote positive emotions and well-being. It encourages individuals to overcome avoidance or withdrawal behaviors, leading to increased motivation, pleasure, and fulfillment.
+
+Exposure and Response Prevention: Exposure therapy involves gradually exposing individuals to feared or avoided situations or stimuli. By doing so, it helps individuals confront and reduce their anxiety or distress. Response prevention involves preventing individuals from engaging in their usual anxiety-driven responses, allowing them to learn new, healthier coping mechanisms.
+
+Skills Training: CBT often includes teaching individuals various coping skills, such as relaxation techniques, problem-solving strategies, and assertiveness training. These skills enhance individuals' ability to manage stress, regulate emotions, and navigate challenging situations effectively.
+
+
+- create a category called morning message
+- this category will be where you will configure your message
+
+- The system checks hourly. To set the time, add an entry as below:
+  time: 6
+  if you want the message to go out at 6AM
+- to add a whole category to the message, add an entry as below:
+  category: todo
+  this will add your entire todo list to the message
+- to add a random entry from one of your categories, type:
+  random: quotes
+  this will display a random entry from your quotes list
+- To enter a message that doesn't change, type:
+  text: Morning Your Highness
+
+An example configuration:
+# morning message
+1. text: Morning your Highness
+2. category: todo
+3. random: quotes
+4. text: Thats all for today. Have a great day.
+5. time: 7
+
+resulting message would be:
+
+
+Morning your Highness
+# todo
+1. Smile
+2. Sell the kids 
+
+# quotes
+1. Don't happy, be worry
+
+Thats all for today. have a great day

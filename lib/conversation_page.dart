@@ -13,8 +13,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class ConversationPage extends StatefulWidget {
-  int prompt_id;
-  ConversationPage(this.prompt_id);
+  String conversation_tag;
+  ConversationPage(this.conversation_tag);
   @override
   ConversationPageState createState() => new ConversationPageState();
 }
@@ -22,7 +22,7 @@ class ConversationPage extends StatefulWidget {
 class ConversationPageState extends State<ConversationPage> {
   Future<bool>? status;
   String user_message = "";
-  int count = 0;
+  int count = 1;
   List<types.Message> _messages = [];
   List<types.Message> _questionMessages = [];
   List<String> _questions = [];
@@ -63,21 +63,40 @@ class ConversationPageState extends State<ConversationPage> {
       author: _BotUser,
       createdAt: DateTime.now().millisecondsSinceEpoch,
       id: const Uuid().v4(),
-      text: _questions[count],
+      text: count.toString() +
+          "/" +
+          (_questions.length - 1).toString() +
+          "\n" +
+          _questions[count],
     );
     _addMessage(textMessage);
   }
 
   void _loadMessages() async {
     Conversation conversation = new Conversation();
-    await conversation.init(widget.prompt_id);
+    await conversation.init(widget.conversation_tag);
     _questions = conversation.conversationList;
-    //Initial Message
-    final textMessage = types.TextMessage(
+
+    //Description
+    var textMessage = types.TextMessage(
       author: _BotUser,
       createdAt: DateTime.now().millisecondsSinceEpoch,
       id: const Uuid().v4(),
       text: _questions[0],
+    );
+
+    _addMessage(textMessage);
+
+    //First Message
+    textMessage = types.TextMessage(
+      author: _BotUser,
+      createdAt: DateTime.now().millisecondsSinceEpoch,
+      id: const Uuid().v4(),
+      text: count.toString() +
+          "/" +
+          (_questions.length - 1).toString() +
+          "\n" +
+          _questions[1],
     );
 
     _addMessage(textMessage);

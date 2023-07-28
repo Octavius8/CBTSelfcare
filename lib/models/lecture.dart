@@ -14,6 +14,8 @@ class Lecture {
     await db.connect();
     Log.debug(this.runtimeType.toString() + "|" + StackTrace.current.toString(),
         "Selecting the data from the db");
+
+    // extra_data2 is a flag 0 watched, 1 watched
     List<Map> listmap = await db.query(
         "select * from prompt where category='LECTURE' and extra_data2='0' order by extra_data4 limit 1;");
 
