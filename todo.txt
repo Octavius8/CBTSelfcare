@@ -51,12 +51,17 @@ List<String> _questions = [
 
 # Research
 
-  The purpose of this app is to teach you to manage and overcome your depression and anxiety by using the proven concepts of CBT. CBT Stands for Cognitive Behavioural Therapy, and is more concerned about producing tangible results in a fixed timeframe compared to other forms of therapy that are based on you understanding the causes of your behaviours and emotions.
-The app will require you to put aside some time periodically, ideally every day and engage in the tutorials and exercises to keep you focused on this journey. The bad news is this will require effort on your part, the good news is that these are proven methods and will yield results if you put in the work. 
+100 word videos.
+
+  The purpose of this app is to teach you to manage and overcome your depression and anxiety by using the proven concepts of CBT. CBT Stands for Cognitive Behavioural Therapy, and is more concerned about producing measurable results in a fixed timeframe.
+The app will require you to put aside some time periodically, ideally every day, and engage in the tutorials and exercises to keep you focused on this journey. The bad news is this will require effort on your part, the good news is that these are proven methods and will yield results if you put in the work. 
 Time for your first lesson. Lets get started.
 - Emphasize importance of being committed to ones self
 - 
 
+
+Blackbox from pixabay | Audio Intro
+invideo
 
 
 Essential Components of CBT

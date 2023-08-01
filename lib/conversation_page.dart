@@ -130,8 +130,8 @@ class ConversationPageState extends State<ConversationPage> {
                 String path = await FilesystemPicker.open(
                       title: 'Save to folder',
                       context: context,
-                      rootDirectory: await getExternalStorageDirectory() ??
-                          await getTemporaryDirectory(),
+                      rootDirectory:
+                          await getApplicationDocumentsDirectory(), // Directory.fromUri(Uri.parse("/")),
                       fsType: FilesystemType.folder,
                       pickText: 'Save file to this folder',
                     ) ??

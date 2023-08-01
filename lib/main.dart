@@ -1,7 +1,5 @@
 import 'dart:ffi';
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:pulse_widget/pulse_widget.dart';
 import 'package:flutter/material.dart';
 import 'conversation_page.dart';
 import 'video_library_page .dart';
@@ -20,6 +18,7 @@ import 'config/api_configs.dart';
 import 'config/system_constants.dart';
 import 'dart:io';
 import 'dart:async';
+import 'package:url_launcher/url_launcher.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -110,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<bool> _serverSync() async {
     SqliteDatabase db = new SqliteDatabase();
-    await db.connect();
+    await db.connect(reset: true);
     await db.serverSync();
     await db.disconnect();
     _getMentalHealthData();
