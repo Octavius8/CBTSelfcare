@@ -53,9 +53,7 @@ List<String> _questions = [
 
 100 word videos.
 
-  The purpose of this app is to teach you to manage and overcome your depression and anxiety by using the proven concepts of CBT. CBT Stands for Cognitive Behavioural Therapy, and is more concerned about producing measurable results in a fixed timeframe.
-The app will require you to put aside some time periodically, ideally every day, and engage in the tutorials and exercises to keep you focused on this journey. The bad news is this will require effort on your part, the good news is that these are proven methods and will yield results if you put in the work. 
-Time for your first lesson. Lets get started.
+
 - Emphasize importance of being committed to ones self
 - 
 
@@ -111,3 +109,35 @@ Morning your Highness
 1. Don't happy, be worry
 
 Thats all for today. have a great day
+
+# 1.0 About this app
+The purpose of this app is to teach you to manage and overcome your depression and anxiety by using the proven concepts of CBT. CBT Stands for Cognitive Behavioural Therapy, and is more concerned about producing measurable results in a fixed timeframe.
+The app will require you to put aside some time periodically, ideally every day, and engage in the tutorials and exercises to keep you focused on this journey. The bad news is this will require effort on your part, the good news is that these are proven methods and will yield results if you put in the work. 
+Time for your first lesson. Lets get started.
+
+# 2.0 What is CBT
+What is CBT? CBT Stands for Cognitive Behavioral Therapy, and is a widely recognized and effective form of psychological therapy that focuses on the connection between thoughts, emotions, and behaviors. It is based on the belief that our thoughts and interpretations of events significantly influence our emotions and actions. Your behaviors can also influence your thoughts and emotions, as well as your emotions affecting your behaviors and thoughts. This interrelationship between the three is referred to as the CBT Triangle. As you might have guessed though, the hardest thing to change directly between the three are your emotions.  Therefore, it is easier to change our emotions by either changing our behaviors or our thoughts. By addressing and modifying your thoughts and behaviors, CBT aims to promote positive changes to your psychological well-being.
+
+# 3.0 Thoughts: Cognitive Restructuring
+CBT contains several essential components. The first component we will talk about, falls under the category of thoughts, and is called Cognitive Restructuring. This involves identifying and challenging negative or unhelpful thoughts and beliefs. By examining the evidence for and against these thoughts, you can replace them with more balanced and helpful alternatives. The helpful thoughts will affect the other 2 components of the CBT triangle, your emotions and your behaviours. By engaging in cognitive restructuring, you can effectively alleviate emotions of distress, improve your mood, and enhance your overall feeling of well-being. The first step in cognitive restructuring is identifying the distortions that occur in your thinking patterns. Here are some common cognitive distortions: 1. All-or-nothing thinking: Viewing situations in black-and-white terms, without considering any shades of gray. 2. Over generalization: Drawing sweeping conclusions based on limited evidence or a single instance. 3. Catastrophizing: Magnifying the importance of negative events and imagining the worst possible outcomes. 4. Personalization: Assuming excessive responsibility for events or situations that are not under your control. 5. Emotional reasoning: Believing that emotions reflect objective reality, despite contradictory evidence. Next time you find yourself in an anxious or depressive episode, take note of what you are saying to yourself. Write it down, and see which of these distortions your different thoughts fall into.
+
+# 3.1 Thoughts: Cognitive Restructuring II 
+Once cognitive distortions are identified, the next step involves actively challenging and replacing unhelpful thoughts with more realistic and balanced ones. This process requires you to examine the evidence supporting your negative thoughts and consider alternative interpretations that align with reality. To do this, we must first identify the negative or unhelpful thoughts. Writing the thought down will make this easier. Then we must ask what evidence supports this thought. After doing this we can ask, what evidence there is against the thought. Once we've established both sides, we can now try to come up with a new explanation that is more balanced, objective, and even positive. By watching this video, you have unlocked the mood tracker tool on the app's home page. This tool will guide you in performing cognitive restructuring as you go through your day. We recommend you use it frequently. You can set fixed times in your day when you can pause, write down your thoughts and follow the process to restructure the unhelpful ones. You can also use it in other moments when you feel particularly anxious or depressed. The more you use this tool, the better you will be at catching yourself when you are having negative thoughts, and you will practice the skill of restructuring them into more helpful thoughts.
+
+
+# 4.0 Behavioral Activation
+Behavioral Activation. Behavioural activation (BA) is a fundamental component of Cognitive Behavioural Therapy (CBT) that aims to alleviate symptoms of depression by encouraging you to engage in positive and goal-directed activities. Behavioural activation is rooted in the principle that our actions and behaviours strongly influence our emotions and thoughts. When we are depressed, we often face a downward spiral of isolation, and decreased activity levels, which perpetuates and intensifies our depressive symptoms. Through behavioural activation, you can reverse this cycle by engaging in activities that provide a sense of pleasure, mastery, and achievement. The first step to doing this is Assessment. Write down what activities you do for every day of a typical week. How active are you in your spare time? How do you feel when you perform those activities? How strong are those feelings. By analysing your activities, you allow yourself to identify specific areas that might need to change, and new behaviors you may need to adopt. The next step is to identify activities that align with your interests, values, and desired outcomes. Come up with a list of activities you would like to try some day, activities you think you would find fun, and activities that would help elevate your mood. After identifying potential activities, the next step is Gradual implementation. Find the easiest activities to try on your list, with the least resistance and give them a go. Ensure to perform the activity regardless of how you feel initially, and write down the dominant feeling plus intensity you have after performing the activity. Try the activities one at a time, each time recording the effect it has on your emotions, and begin integrating the highest performing ones into your days and weeks. It is crucial for you to perform this part slowly and gradually. Trying out all your ideas in one go will likely lead to frustration and overwhelm. By trying them one at a time, you have a chance to isolate which ones are more helpful, and by doing it in manageable bites, you increase your chances of performing it again. This app comes with a section called Mental Hygiene on the home screen that has suggestions for simple and cheap activities you can do to help elevate your mood. The My Tasks section displays one of these at random as a suggestion. You can get another random activity suggestion by clicking on the refresh icon next to the suggestion.
+
+
+#ToDo: write a conversation to gather activities. Assessment.
+# Write a list of possible activities.
+
+Thoroughly assessing the individual's current activity levels, behavioural
+patterns, and depressive symptoms. This helps identify specific areas for intervention and
+forms the basis for tailoring behavioural activation techniques to the individual's needs.
+
+
+
+
+
+

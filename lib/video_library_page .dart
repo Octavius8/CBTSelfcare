@@ -38,9 +38,12 @@ class VideoLibraryPageState extends State<VideoLibraryPage> {
             );
           },
           child: ListTile(
+              minVerticalPadding: 16,
               leading: Icon(Icons.ondemand_video_outlined),
-              title: Text(prompt.name),
-              subtitle: Text(prompt.description))));
+              title: Text(prompt.name,
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle:
+                  Text(prompt.description.substring(0, 100) + "... (More)"))));
       video_list.add(Divider(height: 0));
       Log.debug("VideoLibraryPage | _getVideoData",
           "video_list lenggth is: " + this.video_list.length.toString());
