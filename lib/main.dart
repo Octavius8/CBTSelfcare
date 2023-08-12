@@ -109,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<bool> _serverSync() async {
     SqliteDatabase db = new SqliteDatabase();
-    await db.connect(reset: true);
+    await db.connect(); //reset: true);
     await db.serverSync();
     await db.disconnect();
     _getMentalHealthData();

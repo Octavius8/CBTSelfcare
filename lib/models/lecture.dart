@@ -31,8 +31,7 @@ class Lecture {
           extra_data3: element["extra_data3"] ?? "",
           extra_data4: element["extra_data4"] ?? "");
     });
-    Log.debug(this.runtimeType.toString() + "|" + StackTrace.current.toString(),
-        "Returning latest lecture");
+    Log.debug("getCurrentLecture", "Returning latest lecture");
 
     return tempPrompt;
   }

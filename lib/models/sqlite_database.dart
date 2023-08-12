@@ -56,42 +56,48 @@ class SqliteDatabase {
     // Prompt table update
     Api api = new Api();
     //Todo: Verify db version number first
-    String api_response = await api.postRequest(method: "getAllPrompts") ?? "";
-    if (api_response == "") {
+    try {
+      String api_response =
+          await api.postRequest(method: "getAllPrompts") ?? "";
+      if (api_response == "") {
+        Log.debug("SqliteDatabase | serverSync()",
+            "No data fetched. Ending server syncc");
+        return false;
+      }
       Log.debug("SqliteDatabase | serverSync()",
-          "No data fetched. Ending server syncc");
-      return false;
-    }
-    Log.debug("SqliteDatabase | serverSync()",
-        "Data fetched. Proceeding to update db");
+          "Data fetched. Proceeding to update db");
 
-    var json_response = jsonDecode(api_response);
-    List<dynamic> responseList = json_response["data"];
-    Log.debug("SqliteDatabase | serverSync",
-        "Response list: " + responseList.toString());
+      var json_response = jsonDecode(api_response);
+      List<dynamic> responseList = json_response["data"];
+      Log.debug("SqliteDatabase | serverSync",
+          "Response list: " + responseList.toString());
 
-    await this.database.transaction((txn) async {
-      await txn.rawDelete('DELETE FROM prompt');
-      responseList.forEach((prompt) async {
-        Log.debug("SqliteDatabase | serverSync()", "New entry being processed");
+      await this.database.transaction((txn) async {
+        await txn.rawDelete('DELETE FROM prompt');
+        responseList.forEach((prompt) async {
+          Log.debug(
+              "SqliteDatabase | serverSync()", "New entry being processed");
 
-        var row = {
-          'prompt_id': prompt["prompt_id"],
-          'category': prompt["category"],
-          'name': prompt["name"],
-          'description': prompt["description"],
-          'extra_data1': prompt["extra_data1"],
-          'extra_data2': prompt["extra_data2"],
-          'extra_data3': prompt['extra_data3'],
-          'extra_data4': prompt["extra_data4"],
-        };
-        await database.insert('prompt', row);
+          var row = {
+            'prompt_id': prompt["prompt_id"],
+            'category': prompt["category"],
+            'name': prompt["name"],
+            'description': prompt["description"],
+            'extra_data1': prompt["extra_data1"],
+            'extra_data2': prompt["extra_data2"],
+            'extra_data3': prompt['extra_data3'],
+            'extra_data4': prompt["extra_data4"],
+          };
+          await database.insert('prompt', row);
+        });
       });
-    });
 
-    int count = await this.count();
-    Log.debug(
-        "SqliteDatabase | serverSync()", "DB Count is:" + count.toString());
+      int count = await this.count();
+      Log.debug(
+          "SqliteDatabase | serverSync()", "DB Count is:" + count.toString());
+    } catch (ex) {
+      Log.error("ServerSync", "Sync failed: " + ex.toString());
+    }
     return true;
   }
 

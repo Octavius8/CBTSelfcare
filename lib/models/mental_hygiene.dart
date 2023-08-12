@@ -4,15 +4,12 @@ import "../utils/logger.dart";
 
 class MentalHygiene {
   Future<List<Prompt>> getList() async {
-    Log.debug(this.runtimeType.toString() + "|" + StackTrace.current.toString(),
-        "Starting...");
+    Log.debug("MentalHygiene | getList", "Starting...");
     List<Prompt> finalList = [];
     SqliteDatabase db = new SqliteDatabase();
-    Log.debug(this.runtimeType.toString() + "|" + StackTrace.current.toString(),
-        "Connecting to DB");
+    Log.debug("MentalHygiene | getList", "Connecting to DB");
     await db.connect();
-    Log.debug(this.runtimeType.toString() + "|" + StackTrace.current.toString(),
-        "Selecting the data from the db");
+    Log.debug("MentalHygiene | getList", "Selecting the data from the db");
     List<Map> listmap =
         await db.query("select * from prompt where category='MENTAL_HYGIENE';");
 
