@@ -14,6 +14,7 @@ class SqliteDatabase {
    * Parameters: 
    */
   Future<bool> connect({bool reset = false}) async {
+    Log.debug("SqliteDatabase | Connect()", "Starting connection function...");
     // Get a location using getDatabasesPath
     var databasesPath = await getDatabasesPath();
     String path = databasesPath + DatabaseConfigs.db_name;
@@ -22,17 +23,27 @@ class SqliteDatabase {
     if (reset) await deleteDatabase(path);
 
     // open the database
-    this.database = await openDatabase(path, version: 1,
-        onCreate: (Database db, int version) async {
-      // When creating the db, create the table
-      await db.execute(
-          'CREATE TABLE prompt (prompt_id INTEGER PRIMARY KEY, category TEXT, name TEXT,  version TEXT, description TEXT,extra_data1 TEXT, extra_data2 TEXT,extra_data3 TEXT, extra_data4 TEXT)');
-      await db.execute(
-          'CREATE TABLE prompt_answers (prompt_responses_id INTEGER PRIMARY KEY, prompt_id INTEGER,prompt_name TEXT, version_number TEXT, description TEXT,extra_data1 TEXT, extra_data2 TEXT,extra_data3 TEXT, extra_data4 TEXT,date_created DATETIME DEFAULT CURRENT_TIMESTAMP)');
-      await db.execute(
-          'CREATE TABLE config (prompt_id INTEGER PRIMARY KEY, config_name TEXT, config_value TEXT, date_created DATETIME DEFAULT CURRENT_TIMESTAMP)');
-    });
-
+    try {
+      this.database = await openDatabase(path, version: 1,
+          onCreate: (Database db, int version) async {
+        // When creating the db, create the table
+        await db.execute(
+            'CREATE TABLE prompt (prompt_id INTEGER PRIMARY KEY, category TEXT, name TEXT,  version TEXT, description TEXT,extra_data1 TEXT, extra_data2 TEXT,extra_data3 TEXT, extra_data4 TEXT)');
+        await db.execute(
+            'CREATE TABLE prompt_answers (prompt_responses_id INTEGER PRIMARY KEY, prompt_id INTEGER,prompt_name TEXT, version_number TEXT, description TEXT,extra_data1 TEXT, extra_data2 TEXT,extra_data3 TEXT, extra_data4 TEXT,date_created DATETIME DEFAULT CURRENT_TIMESTAMP)');
+        await db.execute(
+            'CREATE TABLE config (prompt_id INTEGER PRIMARY KEY, config_name TEXT, config_value TEXT, date_created DATETIME DEFAULT CURRENT_TIMESTAMP)');
+      });
+    } catch (ex) {
+      Log.error("SqliteDatabase | Connect()",
+          "Failed to connect to database: " + ex.toString());
+    }
+    if (this.database.isOpen) {
+      Log.debug("SqliteDatabase | Connect()", "Database openned successfully");
+    } else {
+      Log.debug("SqliteDatabase | Connect()", "Database connection failed");
+    }
+    Log.debug("SqliteDatabase | Connect()", "Finished Connection Function.");
     return true;
   }
 
@@ -42,6 +53,7 @@ class SqliteDatabase {
    * Parameters: sql : The SQL query you want to run
    */
   Future<List<Map>> query(sql) async {
+    Log.debug("SqliteDatabase | query", "Starting query: " + sql);
     List<Map> list = await database.rawQuery(sql);
     Log.debug("SqliteDatabase | query", "Response is: " + jsonEncode(list));
     return list;
@@ -52,13 +64,14 @@ class SqliteDatabase {
    * Description: bulk update the table values
    * Parameters: 
    */
-  Future<bool> serverSync() async {
+  Future<bool> serverSync(String uid) async {
     // Prompt table update
     Api api = new Api();
     //Todo: Verify db version number first
     try {
       String api_response =
-          await api.postRequest(method: "getAllPrompts") ?? "";
+          await api.postRequest(method: "getPrompts", data: uid + "|LOGIN") ??
+              "";
       if (api_response == "") {
         Log.debug("SqliteDatabase | serverSync()",
             "No data fetched. Ending server syncc");

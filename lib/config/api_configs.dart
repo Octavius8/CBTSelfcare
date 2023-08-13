@@ -1,5 +1,5 @@
 class APIConfigs {
-  static const String api_url = "https://cbt.ovidware.com";
+  static const String api_url = "https://cbt.ovidware.com/api.php";
   static const String api_key = "6237492837j8efjyyhsidyf";
 
 //Buy Me A Coffee Config

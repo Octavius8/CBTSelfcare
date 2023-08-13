@@ -31,6 +31,8 @@ dependencies:
   filesystem_picker: ^3.1.0
   url_launcher: ^6.1.12
   video_player: ^2.7.0
+  permission_handler: ^10.4.3
+  device_info_plus: ^9.0.3
 
 dev_dependencies:
   flutter_test:

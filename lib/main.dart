@@ -19,6 +19,8 @@ import 'config/system_constants.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -44,6 +46,7 @@ class MyApp extends StatelessWidget {
     double splashscreenOpacity = 0;
     return MaterialApp(
         title: _title,
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
           textTheme: Theme.of(context).textTheme.apply(
@@ -91,6 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Prompt? latest_lecture_prompt;
   bool adsEnabled = false;
   int randomNumber = 0;
+  String uid = "";
 
   initState() {
     // ignore: avoid_print
@@ -100,17 +104,28 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void initialization() async {
-    // This is where you can initialize the resources needed by your app while
-    // the splash screen is displayed.  Remove the following example because
-    // delaying the user experience is a bad design practice!
-    // ignore_for_file: avoid_print
+    //Check permissions
+    if (!await Permission.storage.request().isGranted) {
+      Map<Permission, PermissionStatus> statuses = await [
+        Permission.storage,
+      ].request();
+      Log.debug("Permissions", statuses[Permission.location].toString());
+    }
+
+    //Get device ID
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    uid = androidInfo.serialNumber + "_" + androidInfo.id;
+    Log.debug('Main | initialization()', 'Unique ID is  $uid');
+
+    //Sync Server Data
     await _serverSync();
   }
 
   Future<bool> _serverSync() async {
     SqliteDatabase db = new SqliteDatabase();
     await db.connect(); //reset: true);
-    await db.serverSync();
+    await db.serverSync(uid);
     await db.disconnect();
     _getMentalHealthData();
     _getLatestLecture();
@@ -282,6 +297,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 ),
                                                 InkWell(
                                                   onTap: () {
+                                                    Api api = new Api();
+                                                    api.logActivity(
+                                                        "MYTASKS_VIDEO_CLICK");
                                                     _loadVideoPlayer(
                                                         latest_lecture_prompt);
                                                   },
@@ -323,6 +341,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                                               .color_accent),
                                                     ),
                                                     onTap: () {
+                                                      Api api = new Api();
+                                                      api.logActivity(
+                                                          "MYTASKS_TRACKER_CLICK");
                                                       _loadConversation(
                                                           SystemConstants
                                                               .conversation_tag_mood_tracker);
@@ -342,44 +363,48 @@ class _MyHomePageState extends State<MyHomePage> {
                                                         .color_primary),
                                               ),
                                               InkWell(
-                                                  onTap: () =>
-                                                      showDialog<String>(
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                                context) =>
-                                                            AlertDialog(
-                                                          title: Text(
-                                                              (randomMentalHygienePrompt
-                                                                      ?.name ??
-                                                                  "")),
-                                                          content: Column(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              children: [
-                                                                Icon(
-                                                                    Icons
-                                                                        .clean_hands,
-                                                                    color: ThemeConfigs
-                                                                        .color_primary),
-                                                                Text(
-                                                                  (randomMentalHygienePrompt
-                                                                          ?.description ??
-                                                                      ""),
-                                                                )
-                                                              ]),
-                                                          actions: <Widget>[
-                                                            TextButton(
-                                                              onPressed: () =>
-                                                                  Navigator.pop(
-                                                                      context,
-                                                                      'OK'),
-                                                              child: const Text(
-                                                                  'OK'),
-                                                            ),
-                                                          ],
-                                                        ),
+                                                  onTap: () {
+                                                    Api api = new Api();
+                                                    api.logActivity(
+                                                        "MYTASKS_MH_CLICK");
+                                                    showDialog<String>(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                              context) =>
+                                                          AlertDialog(
+                                                        title: Text(
+                                                            (randomMentalHygienePrompt
+                                                                    ?.name ??
+                                                                "")),
+                                                        content: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              Icon(
+                                                                  Icons
+                                                                      .clean_hands,
+                                                                  color: ThemeConfigs
+                                                                      .color_primary),
+                                                              Text(
+                                                                (randomMentalHygienePrompt
+                                                                        ?.description ??
+                                                                    ""),
+                                                              )
+                                                            ]),
+                                                        actions: <Widget>[
+                                                          TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.pop(
+                                                                    context,
+                                                                    'OK'),
+                                                            child: const Text(
+                                                                'OK'),
+                                                          ),
+                                                        ],
                                                       ),
+                                                    );
+                                                  },
                                                   child: Text(
                                                       (randomMentalHygienePrompt
                                                               ?.name ??
@@ -396,8 +421,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                                               .size_icon_default,
                                                           color: ThemeConfigs
                                                               .color_primary),
-                                                      onTap:
-                                                          _getMentalHealthData)),
+                                                      onTap: () {
+                                                        Api api = new Api();
+                                                        api.logActivity(
+                                                            "MYTASKS_MH_RELOAD");
+                                                        _getMentalHealthData();
+                                                      })),
                                             ]),
                                           ]))),
                             ))),
@@ -442,6 +471,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                         icon: Icons.edit_calendar,
                                         title: "Mood\nTracker",
                                         onTap: () {
+                                          Api api = new Api();
+                                          api.logActivity("MOODTRACKER_CLICK");
                                           _loadConversation(SystemConstants
                                               .conversation_tag_mood_tracker);
                                         }),
@@ -451,7 +482,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                         icon: Icons.clean_hands,
                                         title: "Mental\nHygiene",
                                         enabled: true,
-                                        onTap: _loadMentalHygienePage),
+                                        onTap: () {
+                                          Api api = new Api();
+                                          api.logActivity(
+                                              "MENTALHYGIENE_CLICK");
+                                          _loadMentalHygienePage();
+                                        }),
                                   ),
                                   Expanded(
                                     child: ToolkitIcon(
@@ -459,6 +495,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                         title: "Gratitude\nJournal",
                                         enabled: true,
                                         onTap: () {
+                                          Api api = new Api();
+                                          api.logActivity(
+                                              "GRATITUDEJOURNAL_CLICK");
                                           _loadConversation(SystemConstants
                                               .conversation_tag_gratitude_journal);
                                         }),
@@ -469,6 +508,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                           title: "Speak With A Pro",
                                           enabled: true,
                                           onTap: () {
+                                            Api api = new Api();
+                                            api.logActivity(
+                                                "SPEAKTOAPRO_CLICK");
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(const SnackBar(
                                               content: Center(
@@ -501,6 +543,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           padding: const EdgeInsets.only(right: 16.0, left: 16),
                           child: InkWell(
                             onTap: () {
+                              Api api = new Api();
+                              api.logActivity("BMC_REDIRECT");
                               _launchUrl(APIConfigs.bmc_url);
                               adsEnabled = false;
                               setState(() {});
@@ -513,6 +557,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         InkWell(
                           onTap: () {
+                            Api api = new Api();
+                            api.logActivity("BMC_CANCEL");
                             adsEnabled = false;
                             setState(() {});
                           },
@@ -570,9 +616,13 @@ class _MyHomePageState extends State<MyHomePage> {
           onTap: (index) {
             switch (index) {
               case 1:
+                Api api = new Api();
+                api.logActivity("VIDEOLIBRARY_CLICK");
                 _loadVideoLibrary();
                 break;
               case 2:
+                Api api = new Api();
+                api.logActivity("ABOUTAPP_CLICK");
                 showDialog<String>(
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
@@ -620,6 +670,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
                 break;
               case 3:
+                Api api = new Api();
+                api.logActivity("BMCMENU_CLICK");
                 adsEnabled = adsEnabled ? false : true;
                 setState(() {});
                 break;

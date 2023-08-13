@@ -1,5 +1,10 @@
+# Todo
+- Finish googleplay console listing
+- track logins and time spent on app
+- update link to playstore on website
+
 # Logo
-- bubble_chart icon as logo?
+
 
 ["What is the situation?","What are you doing?"]
 
@@ -58,7 +63,7 @@ List<String> _questions = [
 - 
 
 
-Blackbox from pixabay | Audio Intro
+ | Audio Intro
 invideo
 
 
@@ -129,15 +134,15 @@ Once cognitive distortions are identified, the next step involves actively chall
 Behavioral Activation. Behavioural activation (BA) is a fundamental component of Cognitive Behavioural Therapy (CBT) that aims to alleviate symptoms of depression by encouraging you to engage in positive and goal-directed activities. Behavioural activation is rooted in the principle that our actions and behaviours strongly influence our emotions and thoughts. When we are depressed, we often face a downward spiral of isolation, and decreased activity levels, which perpetuates and intensifies our depressive symptoms. Through behavioural activation, you can reverse this cycle by engaging in activities that provide a sense of pleasure, mastery, and achievement. The first step to doing this is Assessment. Write down what activities you do for every day of a typical week. How active are you in your spare time? How do you feel when you perform those activities? How strong are those feelings. By analysing your activities, you allow yourself to identify specific areas that might need to change, and new behaviors you may need to adopt. The next step is to identify activities that align with your interests, values, and desired outcomes. Come up with a list of activities you would like to try some day, activities you think you would find fun, and activities that would help elevate your mood. After identifying potential activities, the next step is Gradual implementation. Find the easiest activities to try on your list, with the least resistance and give them a go. Ensure to perform the activity regardless of how you feel initially, and write down the dominant feeling plus intensity you have after performing the activity. Try the activities one at a time, each time recording the effect it has on your emotions, and begin integrating the highest performing ones into your days and weeks. It is crucial for you to perform this part slowly and gradually. Trying out all your ideas in one go will likely lead to frustration and overwhelm. By trying them one at a time, you have a chance to isolate which ones are more helpful, and by doing it in manageable bites, you increase your chances of performing it again. This app comes with a section called Mental Hygiene on the home screen that has suggestions for simple and cheap activities you can do to help elevate your mood. The My Tasks section displays one of these at random as a suggestion. You can get another random activity suggestion by clicking on the refresh icon next to the suggestion.
 
 
-#ToDo: write a conversation to gather activities. Assessment.
-# Write a list of possible activities.
+# ToDo: write a conversation to gather activities. Assessment.
 
+# Write a list of possible activities.
 Thoroughly assessing the individual's current activity levels, behavioural
 patterns, and depressive symptoms. This helps identify specific areas for intervention and
 forms the basis for tailoring behavioural activation techniques to the individual's needs.
 
 
 
-
-
-
+# Credits
+- Hotpot.ai
+- Blackbox from pixabay

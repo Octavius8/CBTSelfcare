@@ -13,6 +13,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'dart:io';
+import 'utils/api.dart';
 
 class ConversationPage extends StatefulWidget {
   String conversation_tag;
@@ -69,6 +70,9 @@ class ConversationPageState extends State<ConversationPage> {
     //Save if its the last prompt.
     if (count == _questions.length - 1) {
       await conversation.saveAnswers(_answers);
+
+      Api api = new Api();
+      api.logActivity("CONVERSATION_FINISH_" + widget.conversation_tag);
     }
 
     //End save.
@@ -89,6 +93,10 @@ class ConversationPageState extends State<ConversationPage> {
     conversation = new Conversation();
     await conversation.init(widget.conversation_tag);
     _questions = conversation.conversationList;
+
+    //Log
+    Api api = new Api();
+    api.logActivity("CONVERSATION_START_" + widget.conversation_tag);
 
     //Description
     var textMessage = types.TextMessage(
@@ -124,6 +132,14 @@ class ConversationPageState extends State<ConversationPage> {
         bottomOpacity: 0.0,
         backgroundColor: Colors.grey[100],
         foregroundColor: Colors.black38,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Api api = new Api();
+            api.logActivity("CONVERSATION_EXIT_" + widget.conversation_tag);
+            Navigator.of(context).pop();
+          },
+        ),
         actions: [
           InkWell(
               onTap: () async {
