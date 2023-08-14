@@ -1,9 +1,10 @@
 # Todo
+- Mark video as read when grinds.
+- Fast forward and rewind
+- Encrypt activity log requests.
 - Finish googleplay console listing
-- track logins and time spent on app
 - update link to playstore on website
 
-# Logo
 
 
 ["What is the situation?","What are you doing?"]

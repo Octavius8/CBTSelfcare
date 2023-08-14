@@ -17,8 +17,7 @@ class VideoApp extends StatefulWidget {
 class _VideoAppState extends State<VideoApp> {
   late VideoPlayerController _controller;
   String title = "";
-  String description = "What the what what is going on with the library";
-  bool _player_options_visible = true;
+  String description = "";
   double _trackerPosition = 0;
   Prompt? previous_lecture_prompt;
   Prompt? next_lecture_prompt;
@@ -31,7 +30,20 @@ class _VideoAppState extends State<VideoApp> {
     getLectures();
     _controller = VideoPlayerController.network(widget.prompt.extra_data1)
       ..initialize().then((_) {
-        setState(() {});
+        _controller.addListener(() {
+          //custom Listner
+          setState(() {
+            if (!_controller.value.isPlaying &&
+                _controller.value.isInitialized &&
+                (_controller.value.duration == _controller.value.position)) {
+              Log.debug("VideoPlayer | videoListener",
+                  "Reached end of file. Update to read");
+              //checking the duration and position every time
+              setState(() {});
+            }
+          });
+          setState(() {});
+        });
       });
   }
 

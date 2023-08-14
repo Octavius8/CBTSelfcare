@@ -26,6 +26,10 @@ class SqliteDatabase {
     try {
       this.database = await openDatabase(path, version: 1,
           onCreate: (Database db, int version) async {
+        //log the new installation :)
+        Api api = new Api();
+        api.logActivity("NEW_INSTALLATION");
+
         // When creating the db, create the table
         await db.execute(
             'CREATE TABLE prompt (prompt_id INTEGER PRIMARY KEY, category TEXT, name TEXT,  version TEXT, description TEXT,extra_data1 TEXT, extra_data2 TEXT,extra_data3 TEXT, extra_data4 TEXT)');
