@@ -221,7 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(20),
                           bottomRight: Radius.circular(20))),
-                  margin: EdgeInsets.only(bottom: 32),
+                  margin: EdgeInsets.only(bottom: 16),
                   width: MediaQuery.of(context).size.width,
                   child: Center(child: Text(""))),
               Column(
@@ -279,7 +279,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             // Videos
                                             Padding(
                                               padding: const EdgeInsets.only(
-                                                  bottom: 16.0),
+                                                  bottom: 12.0),
                                               child: Row(children: [
                                                 Padding(
                                                   padding:
@@ -317,7 +317,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             // Trackers
                                             Padding(
                                               padding: const EdgeInsets.only(
-                                                  bottom: 16.0),
+                                                  bottom: 12.0),
                                               child: Row(children: [
                                                 Padding(
                                                   padding:
@@ -432,24 +432,20 @@ class _MyHomePageState extends State<MyHomePage> {
                             ))),
 
                     //Notices
-                    Container(
-                      margin: EdgeInsets.only(bottom: 0),
-                      child: Padding(
-                          padding: EdgeInsets.only(
-                              left: ThemeConfigs.size_card_padding,
-                              right: ThemeConfigs.size_card_padding,
-                              bottom: ThemeConfigs.size_card_padding),
-                          child: Container(
-                              child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                            color: ThemeConfigs.color_primary,
-                            child: Container(
-                              height: 80,
-                            ),
-                          ))),
-                    ),
+                    Center(
+                        child: Container(
+                            margin: EdgeInsets.only(bottom: 0),
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left: ThemeConfigs.size_card_padding,
+                                  right: ThemeConfigs.size_card_padding,
+                                  bottom: ThemeConfigs.size_card_padding),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15.0),
+                                child: Image.network(
+                                    'https://cbt.ovidware.com/files/ad1.jpg'),
+                              ),
+                            ))),
 
                     //Toolkit
                     Padding(

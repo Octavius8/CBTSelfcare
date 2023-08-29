@@ -5,6 +5,7 @@ import "../utils/logger.dart";
 import "../config/api_configs.dart";
 import 'dart:convert';
 import 'package:device_info_plus/device_info_plus.dart';
+import "../utils/encryption.dart";
 
 class Api {
   Future<String?> postRequest({required String method, String? data}) async {
@@ -39,8 +40,11 @@ class Api {
       uid += "|" + action;
 
       var url = Uri.parse(APIConfigs.api_url);
-      var body = jsonEncode(
-          {'apikey': APIConfigs.api_key, 'method': 'logActivity', 'data': uid});
+      var body = jsonEncode({
+        'apikey': APIConfigs.api_key,
+        'method': 'logActivity',
+        'data': Encryption.encrypt(uid)
+      });
 
       Log.debug("Api | postRequest()", "Body: " + body);
       http.Response? finalResponse;

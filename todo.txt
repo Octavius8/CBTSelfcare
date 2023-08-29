@@ -1,10 +1,12 @@
 # Todo
 - Mark video as read when grinds.
 - Fast forward and rewind
-- Encrypt activity log requests.
 - Finish googleplay console listing
 - update link to playstore on website
 
+# Versions
+- 1(1.0.0) - Initial release
+- 1(1.0.1) - Change of Primary color for consistency
 
 
 ["What is the situation?","What are you doing?"]
