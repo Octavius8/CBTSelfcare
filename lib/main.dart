@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'conversation_page.dart';
 import 'video_library_page .dart';
 import 'mental_hygiene_page.dart';
+import 'book_club_page.dart';
 import 'models/mental_hygiene.dart';
 import 'models/lecture.dart';
 import 'models/prompt.dart';
@@ -150,6 +151,13 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => MentalHygienePage()),
+    );
+  }
+
+  void _loadBookClubPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => BookClubPage()),
     );
   }
 
@@ -517,7 +525,18 @@ class _MyHomePageState extends State<MyHomePage> {
                                             ));
                                           })),
                                 ],
-                              )
+                              ),
+                              Row(children: [
+                                ToolkitIcon(
+                                    icon: Icons.book_rounded,
+                                    title: "Book Club",
+                                    enabled: true,
+                                    onTap: () {
+                                      Api api = new Api();
+                                      api.logActivity("BOOKCLUB_CLICK");
+                                      _loadBookClubPage();
+                                    }),
+                              ]),
                             ]))
                   ]),
             ])),
