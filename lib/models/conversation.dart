@@ -7,6 +7,8 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'dart:convert';
+import 'mooddata.dart';
 
 class Conversation {
   List<String> conversationList = [];
@@ -47,11 +49,11 @@ class Conversation {
       'prompt_id': prompt?.prompt_id ?? "",
       'prompt_name': prompt?.name ?? "",
       'version_number': "1",
-      'description': jsonList,
-      'extra_data1': "",
-      'extra_data2': "",
-      'extra_data3': "",
-      'extra_data4': "",
+      'description': prompt?.description,
+      'extra_data1': prompt?.extra_data1,
+      'extra_data2': jsonList,
+      'extra_data3': answers[5],
+      'extra_data4': answers[6],
     };
     await db.database.insert('prompt_answers', row);
     await countAnswers();
@@ -95,5 +97,31 @@ class Conversation {
       count++;
     });
     return count;
+  }
+
+  Future<Map<String, List>> getMoodData() async {
+    SqliteDatabase db = new SqliteDatabase();
+    String sql = "select extra_data3 from prompt_answers group by extra_data3";
+    await db.connect();
+    var list = await db.query(sql);
+    Map<String, List<MoodData>> Moods = new Map();
+
+    // Iterable.castFrom(list).forEach((item) async {
+    const JsonEncoder encoder = JsonEncoder.withIndent('  ');
+    await Future.forEach(Iterable.castFrom(list), (info) async {
+      String tempString = json.encode(info);
+      Map item = json.decode(tempString);
+      var moodName = item!['extra_data3'].toString();
+      sql =
+          "select date_created,extra_data4 from prompt_answers where extra_data3='$moodName';";
+      var data = await db.query(sql);
+      Moods[moodName] = [];
+      Iterable.castFrom(data).forEach((entry) {
+        Moods[moodName]!.add(MoodData(entry['date_created'].toString(),
+            double.tryParse(entry['extra_data4']) ?? 0));
+      });
+    });
+    print("Final Data is " + Moods.toString());
+    return Moods;
   }
 }

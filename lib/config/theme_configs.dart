@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ThemeConfigs {
   //Colors
-  static const Color color_primary = Color(0xFF02587B); //Color(0xFF5BB5C2);
+  static const Color color_primary = Color(0xFF5BB5C2); //Color(0xFF02587B); //
   static const Color color_secondary = Color(0xFFe4eef0); //Colors.grey[100]
   static const Color color_accent = Color(0xFFF4BA00);
   static const Color color_text_default = Colors.black38;

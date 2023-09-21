@@ -3,6 +3,7 @@ import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart
 import 'package:flutter/material.dart';
 import 'conversation_page.dart';
 import 'video_library_page .dart';
+import 'progress_tracker_page.dart';
 import 'mental_hygiene_page.dart';
 import 'book_club_page.dart';
 import 'models/mental_hygiene.dart';
@@ -151,6 +152,13 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => MentalHygienePage()),
+    );
+  }
+
+  void _loadProgressTracker() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ProgressTrackerPage()),
     );
   }
 
@@ -615,6 +623,10 @@ class _MyHomePageState extends State<MyHomePage> {
               label: 'Videos',
             ),
             BottomNavigationBarItem(
+              icon: Icon(Icons.area_chart),
+              label: 'Progress',
+            ),
+            BottomNavigationBarItem(
               icon: Icon(Icons.help),
               label: 'About',
             ),
@@ -636,6 +648,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 _loadVideoLibrary();
                 break;
               case 2:
+                Api api = new Api();
+                api.logActivity("PROGRESS_TRACKER_CLICK");
+                _loadProgressTracker();
+                break;
+              case 3:
                 Api api = new Api();
                 api.logActivity("ABOUTAPP_CLICK");
                 showDialog<String>(
@@ -684,7 +701,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 );
                 break;
-              case 3:
+              case 4:
                 Api api = new Api();
                 api.logActivity("BMCMENU_CLICK");
                 adsEnabled = adsEnabled ? false : true;
