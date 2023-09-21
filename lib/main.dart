@@ -117,9 +117,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
     //Get device ID
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    uid = androidInfo.serialNumber + "_" + androidInfo.id;
-    Log.debug('Main | initialization()', 'Unique ID is  $uid');
+    try {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      uid = androidInfo.serialNumber + "_" + androidInfo.id;
+      Log.debug('Main | initialization()', 'Android Device');
+      Log.debug('Main | initialization()', 'Unique ID is  $uid');
+    } catch (ex) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      uid = iosInfo.utsname.version + "_" + iosInfo.identifierForVendor!;
+      Log.debug('Main | initialization()', 'IOS Device');
+      Log.debug('Main | initialization()', 'Unique ID is  $uid');
+    }
 
     //Sync Server Data
     await _serverSync();
