@@ -3,6 +3,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 import 'models/conversation.dart';
 import 'models/mooddata.dart';
+import 'dart:convert';
 
 class ProgressTrackerPage extends StatefulWidget {
   @override
@@ -13,15 +14,9 @@ class ProgressTrackerPageState extends State<ProgressTrackerPage> {
   Future<bool>? status;
   String user_message = "";
   Map<String, List> map = new Map();
-  List<_SalesData> data = [
-    _SalesData('Jan', 35),
-    _SalesData('Feb', 28),
-    _SalesData('Mar', 34),
-    _SalesData('Apr', 32),
-    _SalesData('May', 40)
-  ];
 
-  List lineSeriesList = [];
+  List lineSeriesList = <ChartSeries<MoodData, String>>[];
+  List<ChartSeries<MoodData, String>> dataList = [];
 
   @override
   void initState() {
@@ -33,16 +28,19 @@ class ProgressTrackerPageState extends State<ProgressTrackerPage> {
     Conversation conv = new Conversation();
     map = await conv.getMoodData();
 
-    List lineSeriesList = [];
     map.forEach((key, value) {
+      List<MoodData> temp = value as List<MoodData>;
+
       lineSeriesList.add(LineSeries<MoodData, String>(
-          dataSource: value,
-          xValueMapper: (_SalesData sales, _) => sales.year,
-          yValueMapper: (_SalesData sales, _) => sales.sales,
-          name: 'Sales',
+          dataSource: temp,
+          xValueMapper: (MoodData mood, _) => mood.year,
+          yValueMapper: (MoodData mood, _) => mood.sales,
+          name: key,
           // Enable data label
           dataLabelSettings: DataLabelSettings(isVisible: true)));
     });
+
+    print("Length is:" + lineSeriesList.length.toString());
   }
 
   @override
@@ -63,30 +61,16 @@ class ProgressTrackerPageState extends State<ProgressTrackerPage> {
         body: Column(children: [
           //Initialize the chart widget
           SfCartesianChart(
-              primaryXAxis: CategoryAxis(),
+            primaryXAxis: CategoryAxis(),
 
-              // Chart title
-              title: ChartTitle(text: 'Your Progress'),
-              // Enable legend
-              legend: Legend(isVisible: true),
-              // Enable tooltip
-              tooltipBehavior: TooltipBehavior(enable: true),
-              series: <ChartSeries<_SalesData, String>>[
-                LineSeries<_SalesData, String>(
-                    dataSource: data,
-                    xValueMapper: (_SalesData sales, _) => sales.year,
-                    yValueMapper: (_SalesData sales, _) => sales.sales,
-                    name: 'Sales',
-                    // Enable data label
-                    dataLabelSettings: DataLabelSettings(isVisible: true)),
-              ]),
+            // Chart title
+            title: ChartTitle(text: 'Your Progress'),
+            // Enable legend
+            legend: Legend(isVisible: true),
+            // Enable tooltip
+            tooltipBehavior: TooltipBehavior(enable: true),
+            series: lineSeriesList,
+          ),
         ]));
   }
-}
-
-class _SalesData {
-  _SalesData(this.year, this.sales);
-
-  final String year;
-  final double sales;
 }
