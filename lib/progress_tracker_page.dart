@@ -1,9 +1,11 @@
+import 'package:cbt/config/theme_configs.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 import 'models/conversation.dart';
 import 'models/mooddata.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 class ProgressTrackerPage extends StatefulWidget {
   @override
@@ -30,10 +32,13 @@ class ProgressTrackerPageState extends State<ProgressTrackerPage> {
 
     map.forEach((key, value) {
       List<MoodData> temp = value as List<MoodData>;
-
+      print("Temp is" + temp[0].toString());
       lineSeriesList.add(LineSeries<MoodData, String>(
           dataSource: temp,
-          xValueMapper: (MoodData mood, _) => mood.year,
+          xValueMapper: (MoodData mood, _) {
+            var parsedDate = DateTime.parse(mood.year);
+            return DateFormat.MMMd().format(parsedDate);
+          },
           yValueMapper: (MoodData mood, _) => mood.sales,
           name: key,
           // Enable data label
@@ -41,6 +46,7 @@ class ProgressTrackerPageState extends State<ProgressTrackerPage> {
     });
 
     print("Length is:" + lineSeriesList.length.toString());
+    setState(() {});
   }
 
   @override
@@ -48,25 +54,32 @@ class ProgressTrackerPageState extends State<ProgressTrackerPage> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          elevation: 0,
-          bottomOpacity: 0.0,
-          backgroundColor: Colors.grey[100],
-          foregroundColor: Colors.black38,
-
-          centerTitle: true,
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text(''),
-        ),
+            elevation: 0,
+            bottomOpacity: 0.0,
+            backgroundColor: Colors.grey[100],
+            foregroundColor: Colors.black38,
+            centerTitle: true,
+            // Here we take the value from the MyHomePage object that was created by
+            // the App.build method, and use it to set our appbar title.
+            title: Text('CBT Selfcare'),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset('assets/logo_alt.png',
+                    width: ThemeConfigs.size_icon_default),
+              )
+            ]),
         body: Column(children: [
           //Initialize the chart widget
           SfCartesianChart(
+            legend: Legend(
+              isVisible: true,
+              position: LegendPosition.bottom,
+            ),
             primaryXAxis: CategoryAxis(),
 
             // Chart title
             title: ChartTitle(text: 'Your Progress'),
-            // Enable legend
-            legend: Legend(isVisible: true),
             // Enable tooltip
             tooltipBehavior: TooltipBehavior(enable: true),
             series: lineSeriesList,

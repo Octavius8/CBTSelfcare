@@ -10,6 +10,7 @@ import 'models/mental_hygiene.dart';
 import 'models/lecture.dart';
 import 'models/prompt.dart';
 import 'config/theme_configs.dart';
+import 'config/api_configs.dart';
 import 'models/sqlite_database.dart';
 import 'dart:developer';
 import 'dart:math';
@@ -457,10 +458,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                   right: ThemeConfigs.size_card_padding,
                                   bottom: ThemeConfigs.size_card_padding),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(15.0),
-                                child: Image.network(
-                                    'https://cbt.ovidware.com/files/ad1.jpg'),
-                              ),
+                                  borderRadius: BorderRadius.circular(15.0),
+                                  child: FadeInImage(
+                                      image: NetworkImage(
+                                          'https://cbt.ovidware.com/files/ad1.jpg'),
+                                      placeholder: AssetImage('ad1.jpg'))),
                             ))),
 
                     //Toolkit
@@ -468,7 +470,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         padding: EdgeInsets.only(
                             left: ThemeConfigs.size_card_padding,
                             right: ThemeConfigs.size_card_padding,
-                            top: ThemeConfigs.size_card_inter_padding),
+                            top: ThemeConfigs.size_card_inter_padding,
+                            bottom: ThemeConfigs.size_card_inter_padding * 2),
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -523,14 +526,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             Api api = new Api();
                                             api.logActivity(
                                                 "SPEAKTOAPRO_CLICK");
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(const SnackBar(
-                                              content: Center(
-                                                  child: Text(
-                                                      "Currently not available in your area.",
-                                                      textAlign:
-                                                          TextAlign.center)),
-                                            ));
+                                            _launchUrl(APIConfigs.speakToAPro);
                                           })),
                                 ],
                               ),

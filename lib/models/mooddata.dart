@@ -3,4 +3,9 @@ class MoodData {
 
   final String year;
   final double sales;
+
+  @override
+  String toString() {
+    return year + "-" + sales.toString();
+  }
 }
