@@ -24,6 +24,7 @@ import 'dart:async';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:shake/shake.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -102,7 +103,13 @@ class _MyHomePageState extends State<MyHomePage> {
   initState() {
     // ignore: avoid_print
     Log.debug("MyHomePage | initState()", "Starting initState...");
-
+    ShakeDetector detector = ShakeDetector.autoStart(onPhoneShake: () {
+      // Do stuff on phone shake
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Updating Data..."),
+      ));
+      initialization();
+    });
     initialization();
   }
 
@@ -114,6 +121,8 @@ class _MyHomePageState extends State<MyHomePage> {
       ].request();
       Log.debug("Permissions", statuses[Permission.location].toString());
     }
+
+    //Shake event.
 
     //Get device ID
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();

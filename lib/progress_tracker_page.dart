@@ -6,6 +6,9 @@ import 'models/conversation.dart';
 import 'models/mooddata.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'utils/api.dart';
+import 'conversation_page.dart';
+import 'config/system_constants.dart';
 
 class ProgressTrackerPage extends StatefulWidget {
   @override
@@ -70,6 +73,43 @@ class ProgressTrackerPageState extends State<ProgressTrackerPage> {
               )
             ]),
         body: Column(children: [
+          Container(
+            child: SizedBox(
+              width: 300,
+              height: 100,
+              child: Center(
+                  child: Column(children: [
+                lineSeriesList.length == 0
+                    ? Text(
+                        'You have no Mood Tracker entries, click the link below to go to the mood tracker.\n',
+                        textAlign: TextAlign.center)
+                    : Text("Click the link below to go to the mood tracker.\n",
+                        textAlign: TextAlign.center),
+                InkWell(
+                    onTap: () {
+                      Api api = new Api();
+                      api.logActivity("CHART_MOODTRACKER_CLICK");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ConversationPage(
+                                SystemConstants.conversation_tag_mood_tracker)),
+                      ).then((value) {
+                        getMoodData();
+                      });
+                    },
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.edit_calendar,
+                              color: ThemeConfigs.color_accent),
+                          Text(" Mood Tracker",
+                              style:
+                                  TextStyle(color: ThemeConfigs.color_accent))
+                        ]))
+              ])),
+            ),
+          ),
           //Initialize the chart widget
           SfCartesianChart(
             legend: Legend(

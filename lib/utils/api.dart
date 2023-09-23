@@ -32,7 +32,7 @@ class Api {
   }
 
   Future<bool> logActivity(String action) async {
-    /*try {
+    try {
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
       String uid = androidInfo.serialNumber + "_" + androidInfo.id;
@@ -63,7 +63,7 @@ class Api {
           "returning response:" + (finalResponse?.body ?? ""));
     } catch (ex) {
       Log.error("Api | logActivity()", "Failed to log:" + ex.toString());
-    }*/
+    }
     return true;
   }
 }
