@@ -152,9 +152,16 @@ class _MyHomePageState extends State<MyHomePage> {
     return true;
   }
 
-  Future<void> _launchUrl(String url) async {
-    if (!await launchUrl(Uri.parse(url))) {
-      throw Exception('Could not launch $url');
+  Future<void> _launchUrl(String url, {bool external = true}) async {
+    if (external) {
+      if (!await launchUrl(Uri.parse(url),
+          mode: LaunchMode.externalApplication)) {
+        throw Exception('Could not launch $url');
+      }
+    } else {
+      if (!await launchUrl(Uri.parse(url))) {
+        throw Exception('Could not launch $url');
+      }
     }
   }
 
@@ -543,7 +550,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                             Api api = new Api();
                                             api.logActivity(
                                                 "SPEAKTOAPRO_CLICK");
-                                            _launchUrl(APIConfigs.speakToAPro);
+                                            _launchUrl(APIConfigs.speakToAPro,
+                                                external: true);
                                           })),
                                 ],
                               ),

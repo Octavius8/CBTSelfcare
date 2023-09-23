@@ -7,5 +7,5 @@ class APIConfigs {
 
 //Whatsapp
   static const String speakToAPro =
-      "https://wa.me/260969173945?text=Hello%2C%20I%20got%20your%20number%20from%20the%20CBT%20Selfcare%20App%2C%20and%20I%20wanted%20some%20information%20about%20your%20services.";
+      "https://wa.me/260969173945?text=Hello%2C+I+got+your+number+from+CBT+Selfcare+app%2C+and+I+would+like+to+know+more+about+your+services.";
 }
