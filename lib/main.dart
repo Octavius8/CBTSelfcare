@@ -99,6 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool adsEnabled = false;
   int randomNumber = 0;
   String uid = "";
+  bool dataSynced = false;
 
   initState() {
     // ignore: avoid_print
@@ -114,6 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void initialization() async {
+    dataSynced = false;
     //Check permissions
     if (!await Permission.storage.request().isGranted) {
       Map<Permission, PermissionStatus> statuses = await [
@@ -140,6 +142,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     //Sync Server Data
     await _serverSync();
+    dataSynced = true;
+    setState(() {});
   }
 
   Future<bool> _serverSync() async {
@@ -299,177 +303,195 @@ class _MyHomePageState extends State<MyHomePage> {
                                       color: Colors.white, //<-- SEE HERE
                                     ),
                                   ),
-                                  child: Padding(
-                                      padding: EdgeInsets.all(
-                                          ThemeConfigs.size_card_padding),
-                                      child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            //My Tasks
-                                            Padding(
-                                                padding:
-                                                    EdgeInsets.only(bottom: 20),
-                                                child: Text("My Tasks:",
-                                                    style: TextStyle(
-                                                      fontSize: ThemeConfigs
-                                                          .font_title_size,
-                                                      // fontWeight: FontWeight.bold
-                                                    ))),
+                                  child: dataSynced
+                                      ? Padding(
+                                          padding: EdgeInsets.all(
+                                              ThemeConfigs.size_card_padding),
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                //My Tasks
+                                                Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 20),
+                                                    child: Text("My Tasks:",
+                                                        style: TextStyle(
+                                                          fontSize: ThemeConfigs
+                                                              .font_title_size,
+                                                          // fontWeight: FontWeight.bold
+                                                        ))),
 
-                                            // Videos
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 12.0),
-                                              child: Row(children: [
+                                                // Videos
                                                 Padding(
                                                   padding:
                                                       const EdgeInsets.only(
-                                                          left: 16, right: 16),
-                                                  child: Icon(
-                                                      Icons.video_library,
-                                                      size: ThemeConfigs
-                                                          .size_icon_default,
-                                                      color: ThemeConfigs
-                                                          .color_primary),
-                                                ),
-                                                Text(
-                                                  ("Video: "),
-                                                ),
-                                                InkWell(
-                                                  onTap: () {
-                                                    Api api = new Api();
-                                                    api.logActivity(
-                                                        "MYTASKS_VIDEO_CLICK");
-                                                    _loadVideoPlayer(
-                                                        latest_lecture_prompt);
-                                                  },
-                                                  child: Text(
-                                                      (latest_lecture_prompt
-                                                              ?.name ??
-                                                          ""),
-                                                      style: TextStyle(
-                                                          color: ThemeConfigs
-                                                              .color_accent)),
-                                                ),
-                                              ]),
-                                            ),
-
-                                            // Trackers
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 12.0),
-                                              child: Row(children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 16, right: 16),
-                                                  child: Icon(
-                                                      Icons.edit_calendar,
-                                                      size: ThemeConfigs
-                                                          .size_icon_default,
-                                                      color: ThemeConfigs
-                                                          .color_primary),
-                                                ),
-                                                Text(
-                                                  ("Tracker:"),
-                                                ),
-                                                InkWell(
-                                                    child: Text(
-                                                      ("  Mood Tracker"),
-                                                      style: TextStyle(
-                                                          color: ThemeConfigs
-                                                              .color_accent),
-                                                    ),
-                                                    onTap: () {
-                                                      Api api = new Api();
-                                                      api.logActivity(
-                                                          "MYTASKS_TRACKER_CLICK");
-                                                      _loadConversation(
-                                                          SystemConstants
-                                                              .conversation_tag_mood_tracker);
-                                                    }),
-                                              ]),
-                                            ),
-
-                                            //Mental Hygiene
-                                            Wrap(children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 16, right: 16),
-                                                child: Icon(Icons.clean_hands,
-                                                    size: ThemeConfigs
-                                                        .size_icon_default,
-                                                    color: ThemeConfigs
-                                                        .color_primary),
-                                              ),
-                                              InkWell(
-                                                  onTap: () {
-                                                    Api api = new Api();
-                                                    api.logActivity(
-                                                        "MYTASKS_MH_CLICK");
-                                                    showDialog<String>(
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                              context) =>
-                                                          AlertDialog(
-                                                        title: Text(
-                                                            (randomMentalHygienePrompt
-                                                                    ?.name ??
-                                                                "")),
-                                                        content: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              Icon(
-                                                                  Icons
-                                                                      .clean_hands,
-                                                                  color: ThemeConfigs
-                                                                      .color_primary),
-                                                              Text(
-                                                                (randomMentalHygienePrompt
-                                                                        ?.description ??
-                                                                    ""),
-                                                              )
-                                                            ]),
-                                                        actions: <Widget>[
-                                                          TextButton(
-                                                            onPressed: () =>
-                                                                Navigator.pop(
-                                                                    context,
-                                                                    'OK'),
-                                                            child: const Text(
-                                                                'OK'),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  },
-                                                  child: Text(
-                                                      (randomMentalHygienePrompt
-                                                              ?.name ??
-                                                          ""),
-                                                      style: TextStyle(
-                                                          color: ThemeConfigs
-                                                              .color_accent))),
-                                              Padding(
-                                                  padding:
-                                                      EdgeInsets.only(left: 16),
-                                                  child: InkWell(
-                                                      child: Icon(Icons.refresh,
+                                                          bottom: 12.0),
+                                                  child: Row(children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 16,
+                                                              right: 16),
+                                                      child: Icon(
+                                                          Icons.video_library,
                                                           size: ThemeConfigs
                                                               .size_icon_default,
                                                           color: ThemeConfigs
                                                               .color_primary),
+                                                    ),
+                                                    Text(
+                                                      ("Video: "),
+                                                    ),
+                                                    InkWell(
                                                       onTap: () {
                                                         Api api = new Api();
                                                         api.logActivity(
-                                                            "MYTASKS_MH_RELOAD");
-                                                        _getMentalHealthData();
-                                                      })),
-                                            ]),
-                                          ]))),
+                                                            "MYTASKS_VIDEO_CLICK");
+                                                        _loadVideoPlayer(
+                                                            latest_lecture_prompt);
+                                                      },
+                                                      child: Text(
+                                                          (latest_lecture_prompt
+                                                                  ?.name ??
+                                                              ""),
+                                                          style: TextStyle(
+                                                              color: ThemeConfigs
+                                                                  .color_accent)),
+                                                    ),
+                                                  ]),
+                                                ),
+
+                                                // Trackers
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          bottom: 12.0),
+                                                  child: Row(children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 16,
+                                                              right: 16),
+                                                      child: Icon(
+                                                          Icons.edit_calendar,
+                                                          size: ThemeConfigs
+                                                              .size_icon_default,
+                                                          color: ThemeConfigs
+                                                              .color_primary),
+                                                    ),
+                                                    Text(
+                                                      ("Tracker:"),
+                                                    ),
+                                                    InkWell(
+                                                        child: Text(
+                                                          ("  Mood Tracker"),
+                                                          style: TextStyle(
+                                                              color: ThemeConfigs
+                                                                  .color_accent),
+                                                        ),
+                                                        onTap: () {
+                                                          Api api = new Api();
+                                                          api.logActivity(
+                                                              "MYTASKS_TRACKER_CLICK");
+                                                          _loadConversation(
+                                                              SystemConstants
+                                                                  .conversation_tag_mood_tracker);
+                                                        }),
+                                                  ]),
+                                                ),
+
+                                                //Mental Hygiene
+                                                Wrap(children: [
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 16,
+                                                            right: 16),
+                                                    child: Icon(
+                                                        Icons.clean_hands,
+                                                        size: ThemeConfigs
+                                                            .size_icon_default,
+                                                        color: ThemeConfigs
+                                                            .color_primary),
+                                                  ),
+                                                  InkWell(
+                                                      onTap: () {
+                                                        Api api = new Api();
+                                                        api.logActivity(
+                                                            "MYTASKS_MH_CLICK");
+                                                        showDialog<String>(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                                  context) =>
+                                                              AlertDialog(
+                                                            title: Text(
+                                                                (randomMentalHygienePrompt
+                                                                        ?.name ??
+                                                                    "")),
+                                                            content: Column(
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .min,
+                                                                children: [
+                                                                  Icon(
+                                                                      Icons
+                                                                          .clean_hands,
+                                                                      color: ThemeConfigs
+                                                                          .color_primary),
+                                                                  Text(
+                                                                    (randomMentalHygienePrompt
+                                                                            ?.description ??
+                                                                        ""),
+                                                                  )
+                                                                ]),
+                                                            actions: <Widget>[
+                                                              TextButton(
+                                                                onPressed: () =>
+                                                                    Navigator.pop(
+                                                                        context,
+                                                                        'OK'),
+                                                                child:
+                                                                    const Text(
+                                                                        'OK'),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: Text(
+                                                          (randomMentalHygienePrompt
+                                                                  ?.name ??
+                                                              ""),
+                                                          style: TextStyle(
+                                                              color: ThemeConfigs
+                                                                  .color_accent))),
+                                                  Padding(
+                                                      padding: EdgeInsets.only(
+                                                          left: 16),
+                                                      child: InkWell(
+                                                          child: Icon(
+                                                              Icons.refresh,
+                                                              size: ThemeConfigs
+                                                                  .size_icon_default,
+                                                              color: ThemeConfigs
+                                                                  .color_primary),
+                                                          onTap: () {
+                                                            Api api = new Api();
+                                                            api.logActivity(
+                                                                "MYTASKS_MH_RELOAD");
+                                                            _getMentalHealthData();
+                                                          })),
+                                                ]),
+                                              ]))
+                                      : Center(
+                                          child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 32.0, bottom: 32),
+                                          child: CircularProgressIndicator(
+                                              color:
+                                                  ThemeConfigs.color_primary),
+                                        ))),
                             ))),
 
                     //Notices
@@ -486,7 +508,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: FadeInImage(
                                       image: NetworkImage(
                                           'https://cbt.ovidware.com/files/ad1.jpg'),
-                                      placeholder: AssetImage('ad1.jpg'))),
+                                      placeholder:
+                                          AssetImage('assets/ad1.jpg'))),
                             ))),
 
                     //Toolkit
