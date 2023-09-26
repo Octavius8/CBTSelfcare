@@ -52,6 +52,7 @@ android {
         applicationId "com.ovidware.cbtselfcare"
         minSdkVersion 19//flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
+        multiDexEnabled = true
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -84,4 +85,5 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.google.android.gms:play-services-ads:22.4.0'
 }

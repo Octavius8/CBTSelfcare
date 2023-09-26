@@ -1,3 +1,4 @@
+import 'package:cbt/config/api_configs.dart';
 import 'package:cbt/config/theme_configs.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -9,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'utils/api.dart';
 import 'conversation_page.dart';
 import 'config/system_constants.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class ProgressTrackerPage extends StatefulWidget {
   @override
@@ -19,13 +21,16 @@ class ProgressTrackerPageState extends State<ProgressTrackerPage> {
   Future<bool>? status;
   String user_message = "";
   Map<String, List> map = new Map();
-
   List lineSeriesList = <ChartSeries<MoodData, String>>[];
   List<ChartSeries<MoodData, String>> dataList = [];
+  String adUnitId = APIConfigs.adUnitID;
+  BannerAd? _bannerAd;
+  bool _isLoaded = false;
 
   @override
   void initState() {
     getMoodData();
+    loadAd();
     super.initState();
   }
 
@@ -124,6 +129,46 @@ class ProgressTrackerPageState extends State<ProgressTrackerPage> {
             tooltipBehavior: TooltipBehavior(enable: true),
             series: lineSeriesList,
           ),
+
+          //Advert
+          Container(
+            width: _bannerAd!.size.width.toDouble(),
+            height: 72.0,
+            alignment: Alignment.center,
+            child: AdWidget(ad: _bannerAd!),
+          ),
         ]));
+  }
+
+  @override
+  void dispose() {
+    // TODO: Dispose a BannerAd object
+    _bannerAd?.dispose();
+
+    super.dispose();
+  }
+
+  void loadAd() {
+    _bannerAd = BannerAd(
+      adUnitId: adUnitId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        // Called when an ad is successfully received.
+        onAdLoaded: (ad) {
+          debugPrint('$ad loaded.');
+          _bannerAd = ad as BannerAd;
+          setState(() {
+            _isLoaded = true;
+          });
+        },
+        // Called when an ad request failed.
+        onAdFailedToLoad: (ad, err) {
+          debugPrint('BannerAd failed to load: $err');
+          // Dispose the ad here to free resources.
+          ad.dispose();
+        },
+      ),
+    )..load();
   }
 }

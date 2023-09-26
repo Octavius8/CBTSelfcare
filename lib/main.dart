@@ -25,6 +25,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:shake/shake.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -38,6 +39,7 @@ class MyHttpOverrides extends HttpOverrides {
 void main() {
   HttpOverrides.global = MyHttpOverrides();
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   runApp(MyApp());
 }
 
