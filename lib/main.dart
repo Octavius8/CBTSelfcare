@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'package:flutter/material.dart';
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'conversation_page.dart';
@@ -12,12 +13,10 @@ import 'models/prompt.dart';
 import 'config/theme_configs.dart';
 import 'config/api_configs.dart';
 import 'models/sqlite_database.dart';
-import 'dart:developer';
 import 'dart:math';
 import 'utils/logger.dart';
 import 'video_player.dart';
 import 'utils/api.dart';
-import 'config/api_configs.dart';
 import 'config/system_constants.dart';
 import 'dart:io';
 import 'dart:async';
@@ -26,6 +25,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:shake/shake.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'dart:convert';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -114,6 +115,46 @@ class _MyHomePageState extends State<MyHomePage> {
       initialization();
     });
     initialization();
+    checkAppVersion();
+  }
+
+  void checkAppVersion() async {
+    try {
+      Api api = new Api();
+      api.logActivity("LOGIN");
+      String api_response =
+          await api.postRequest(method: "getLatestVersion") ?? "";
+      if (api_response == "") {
+        //No App Version data returned
+        Log.debug("Main | checkAppVersion()", "No data fetched.");
+      } else {
+        //Version Data Found
+        PackageInfo packageInfo = await PackageInfo.fromPlatform();
+        String system_version =
+            packageInfo.version + "+" + packageInfo.buildNumber;
+
+        var json_response = jsonDecode(api_response);
+        var jsonObject = jsonDecode(json_response["data"]);
+        String api_version = jsonObject['version'];
+        String api_data = jsonObject['data'];
+
+        Log.debug(
+            "Main | checkAppVersion()",
+            "API Version is  " +
+                api_version +
+                " system version is " +
+                system_version);
+
+        if (api_version != system_version) {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) =>
+                  _buildPopupDialog(context, data: api_data));
+        }
+      }
+    } catch (Ex) {
+      int a = 1;
+    }
   }
 
   void initialization() async {
@@ -229,6 +270,37 @@ class _MyHomePageState extends State<MyHomePage> {
     Lecture lecture = new Lecture();
     latest_lecture_prompt = await lecture.getCurrentLecture();
     setState(() {});
+  }
+
+  Widget _buildPopupDialog(BuildContext context, {required String data}) {
+    return new AlertDialog(
+      title: const Text('New Version Available'),
+      content: new Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(data),
+        ],
+      ),
+      actions: <Widget>[
+        new TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Close'),
+        ),
+        new TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: InkWell(
+              onTap: () {
+                _launchUrl(APIConfigs.playStoreLink, external: true);
+              },
+              child: const Text('Update')),
+        ),
+      ],
+    );
   }
 
   @override

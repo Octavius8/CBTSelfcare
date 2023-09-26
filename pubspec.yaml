@@ -41,6 +41,7 @@ dependencies:
   syncfusion_flutter_charts: ^23.1.36
   shake: ^2.2.0
   google_mobile_ads: ^2.0.0
+  package_info_plus: ^4.1.0
 
 dev_dependencies:
   flutter_test:

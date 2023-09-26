@@ -11,6 +11,11 @@
 - 1.0.2+4 - Added book_club
 - 1.0.3+7 - Added Admob Adverts
 
+# Go Live Checklists
+- Check Admob Version Changed to production
+- Check Usage Stats Pointing to Production
+- Update latest version on API
+
 
 ["What is the situation?","What are you doing?"]
 
