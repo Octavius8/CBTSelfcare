@@ -10,6 +10,7 @@
 - 1.0.1+3 - Fix for production data sync issue 
 - 1.0.2+4 - Added book_club
 - 1.0.3+7 - Added Admob Adverts
+- 1.0.4+9 - Added popup for book club, show new version is available.
 
 # Go Live Checklists
 - Check Admob Version Changed to production

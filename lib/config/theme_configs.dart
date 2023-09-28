@@ -12,6 +12,7 @@ class ThemeConfigs {
   static const double size_card_inter_padding = 24;
   static const double size_icon_small = 16;
   static const double size_icon_default = 24;
+  static const double size_icon_large = 40;
 
   //Fonts
   static const double font_title_size = 16;

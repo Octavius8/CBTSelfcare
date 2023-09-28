@@ -5,6 +5,8 @@ import 'utils/logger.dart';
 import 'dart:async';
 import 'package:url_launcher/url_launcher.dart';
 import 'utils/api.dart';
+import 'config/system_constants.dart';
+import 'config/theme_configs.dart';
 
 class BookClubPage extends StatefulWidget {
   @override
@@ -64,7 +66,37 @@ class BookClubPageState extends State<BookClubPage> {
         " BookClubPage | _getMentalHealthData",
         "Setting state: mental_health_list length is: " +
             mental_health_list.length.toString());
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => _buildPopupDialog(context));
     setState(() {});
+  }
+
+  Widget _buildPopupDialog(BuildContext context) {
+    return new AlertDialog(
+      title: const Text('Book Club'),
+      content: new Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Center(
+              child: Padding(
+                  padding: EdgeInsets.all(ThemeConfigs.size_card_padding),
+                  child: Icon(Icons.book_rounded,
+                      color: ThemeConfigs.color_primary,
+                      size: ThemeConfigs.size_icon_large))),
+          Center(child: Text(SystemConstants.popup_bookclub_narration)),
+        ],
+      ),
+      actions: <Widget>[
+        new TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Close'),
+        ),
+      ],
+    );
   }
 
   @override
