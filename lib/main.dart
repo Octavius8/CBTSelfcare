@@ -27,6 +27,9 @@ import 'package:shake/shake.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'dart:convert';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:share_plus/share_plus.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -37,10 +40,11 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
-void main() {
+void main() async {
   HttpOverrides.global = MyHttpOverrides();
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
+  await AndroidAlarmManager.initialize();
   runApp(MyApp());
 }
 
@@ -103,6 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int randomNumber = 0;
   String uid = "";
   bool dataSynced = false;
+  final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   initState() {
     // ignore: avoid_print
@@ -115,7 +120,47 @@ class _MyHomePageState extends State<MyHomePage> {
       initialization();
     });
     initialization();
-    checkAppVersion();
+
+    WidgetsFlutterBinding.ensureInitialized();
+    localNotificationSetup();
+  }
+
+  void onSelectNotification(NotificationResponse nr) {
+    Api api = new Api();
+    api.logActivity("NOTIFICATION_MOODTRACKER_CLICK");
+    _loadConversation(SystemConstants.conversation_tag_mood_tracker);
+  }
+
+  Future<void> localNotificationSetup() async {
+    const androidInitializationSetting =
+        AndroidInitializationSettings('@drawable/app_icon');
+    const iosInitializationSetting = DarwinInitializationSettings();
+    const initSettings = InitializationSettings(
+        android: androidInitializationSetting, iOS: iosInitializationSetting);
+    await _flutterLocalNotificationsPlugin.initialize(initSettings,
+        onDidReceiveNotificationResponse: onSelectNotification);
+
+    await AndroidAlarmManager.initialize();
+
+    await AndroidAlarmManager.periodic(
+        const Duration(seconds: 20), 0, showLocalNotification);
+  }
+
+  String showLocalNotification() {
+    String title = "Wadada";
+    String body = "Ras Wadada!";
+    Log.debug("Main showLocalNotification | ", "Showing local Notification");
+    return title;
+    /*const androidNotificationDetail = AndroidNotificationDetails(
+        '0', // channel Id
+        'general' // channel Name
+        );
+    const iosNotificatonDetail = DarwinNotificationDetails();
+    const notificationDetails = NotificationDetails(
+      iOS: iosNotificatonDetail,
+      android: androidNotificationDetail,
+    );
+    _flutterLocalNotificationsPlugin.show(0, title, body, notificationDetails);*/
   }
 
   void checkAppVersion() async {
@@ -148,8 +193,115 @@ class _MyHomePageState extends State<MyHomePage> {
         if (api_version != system_version) {
           showDialog(
               context: context,
-              builder: (BuildContext context) =>
-                  _buildPopupDialog(context, data: api_data));
+              builder: (BuildContext context) => _buildPopupDialog(context,
+                  title: 'New Version Available',
+                  data: api_data,
+                  icon: Icons.update,
+                  action: InkWell(
+                      onTap: () {
+                        _launchUrl(APIConfigs.playStoreLink, external: true);
+                        api.logActivity("POPUP_UPDATE_APP_CLICK");
+                      },
+                      child: const Text('Update'))));
+        } else {
+          SqliteDatabase db = new SqliteDatabase();
+          await db.connect();
+          int logins = int.parse(await db.getConfig("LOGINS"));
+          Log.debug("Main | CheckAppVersion",
+              "Number of logins is: " + logins.toString());
+          switch (logins) {
+            case 1:
+              Log.debug("Main | Load Popup", "logins count is 1.");
+              String _title = "Welcome to the CBT App!";
+              String _body =
+                  "Thanks for giving the app a try.\nTo begin, follow the prompts under the Getting Started Section.\n";
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) => _buildPopupDialog(context,
+                      title: _title, data: _body, icon: Icons.celebration));
+              break;
+            case 3:
+              Log.debug("Main | Load Popup", "logins count is 3.");
+              String _title = "Share this App With Someone You Care About.";
+              String _body =
+                  "Enjoying this app? Please share it with your friends and loved ones by selecting the share button.";
+
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) => _buildPopupDialog(context,
+                      title: _title,
+                      data: _body,
+                      icon: Icons.share,
+                      action: InkWell(
+                          onTap: () {
+                            api.logActivity("POPUP_SHARE_LINK_CLICK");
+                            Share.share(APIConfigs.shareLink);
+                          },
+                          child: const Text('Share'))));
+              break;
+            case 6:
+              Log.debug("Main | Load Popup", "logins count is 3.");
+              String _title = "Want to Support us?";
+              String _body =
+                  "Please rate and give your feedback on the Playstore. :)";
+
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) => _buildPopupDialog(context,
+                      title: _title,
+                      data: _body,
+                      icon: Icons.star_rate,
+                      action: InkWell(
+                          onTap: () {
+                            api.logActivity("POPUP_RATE_APP_CLICK");
+                            _launchUrl(APIConfigs.playStoreLink,
+                                external: true);
+                          },
+                          child: const Text('Rate The App'))));
+              break;
+            default:
+              Log.debug(
+                  "Main | Load Popup", "logins count is " + logins.toString());
+
+              if (logins % 10 == 0) {
+                String _title = "Want to Support us?";
+                String _body =
+                    "Please rate and give your feedback on the Playstore. :)";
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) =>
+                        _buildPopupDialog(context,
+                            title: _title,
+                            data: _body,
+                            icon: Icons.star_rate,
+                            action: InkWell(
+                                onTap: () {
+                                  api.logActivity("POPUP_RATE_APP_CLICK");
+                                  _launchUrl(APIConfigs.playStoreLink,
+                                      external: true);
+                                },
+                                child: const Text('Rate The App'))));
+              } else if (logins % 7 == 0) {
+                String _title = "Share this App With Someone You Care About.";
+                String _body =
+                    "Enjoying this app? Please share it with your friends and loved ones by selecting the share button.";
+
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) =>
+                        _buildPopupDialog(context,
+                            title: _title,
+                            data: _body,
+                            icon: Icons.share,
+                            action: InkWell(
+                                onTap: () {
+                                  api.logActivity("POPUP_SHARE_LINK_CLICK");
+                                  Share.share(APIConfigs.shareLink);
+                                },
+                                child: const Text('Share'))));
+                break;
+              }
+          }
         }
       }
     } catch (Ex) {
@@ -186,6 +338,12 @@ class _MyHomePageState extends State<MyHomePage> {
     //Sync Server Data
     await _serverSync();
     dataSynced = true;
+
+    //Configs
+    SqliteDatabase db = new SqliteDatabase();
+    await db.connect();
+    //db.setConfig("LOGINS", "0");
+
     setState(() {});
   }
 
@@ -193,9 +351,14 @@ class _MyHomePageState extends State<MyHomePage> {
     SqliteDatabase db = new SqliteDatabase();
     await db.connect(); //reset: true);
     await db.serverSync(uid);
+    int newCount = int.parse(await db.getConfig("LOGINS")) + 1;
+    Log.debug("Main Login Count ", "New Count is " + newCount.toString());
+    await db.setConfig("LOGINS", newCount.toString());
     await db.disconnect();
+    checkAppVersion();
     _getMentalHealthData();
     _getLatestLecture();
+
     return true;
   }
 
@@ -272,9 +435,16 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
-  Widget _buildPopupDialog(BuildContext context, {required String data}) {
+  Widget _buildPopupDialog(BuildContext context,
+      {required String title,
+      required String data,
+      required IconData icon,
+      Widget action = const SizedBox.shrink()}) {
     return new AlertDialog(
-      title: const Text('New Version Available'),
+      icon: Icon(icon,
+          color: ThemeConfigs.color_primary,
+          size: ThemeConfigs.size_icon_large),
+      title: Text(title),
       content: new Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,11 +463,7 @@ class _MyHomePageState extends State<MyHomePage> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: InkWell(
-              onTap: () {
-                _launchUrl(APIConfigs.playStoreLink, external: true);
-              },
-              child: const Text('Update')),
+          child: action,
         ),
       ],
     );
@@ -349,9 +515,52 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     Padding(
                         padding: EdgeInsets.only(left: 16),
-                        child: Text("Start Here",
-                            style: TextStyle(
-                                fontSize: ThemeConfigs.font_title_size))),
+                        child: InkWell(
+                          onTap: () {
+                            showLocalNotification();
+                            Log.debug("Main", "Showing Android Notification");
+                          },
+                          child: Row(children: [
+                            Text("Start Here",
+                                style: TextStyle(
+                                    fontSize: ThemeConfigs.font_title_size)),
+                            Expanded(child: Text("")),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 24.0),
+                              child: InkWell(
+                                onTap: () {
+                                  Api api = new Api();
+                                  api.logActivity(
+                                      "HOMESCREEN_SHARE_LINK_CLICK");
+                                  String _title =
+                                      "Share this App With Someone You Care About.";
+                                  String _body =
+                                      "Enjoying this app? Please share it with your friends and loved ones by selecting the share button.";
+
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          _buildPopupDialog(context,
+                                              title: _title,
+                                              data: _body,
+                                              icon: Icons.share,
+                                              action: InkWell(
+                                                  onTap: () {
+                                                    Api api = new Api();
+                                                    api.logActivity(
+                                                        "HOMESCREEN_POPUP_SHARE_LINK_CLICK");
+                                                    Share.share(
+                                                        APIConfigs.shareLink);
+                                                  },
+                                                  child: const Text('Share'))));
+                                },
+                                child: Icon(Icons.share,
+                                    size: ThemeConfigs.size_icon_small,
+                                    color: ThemeConfigs.color_accent),
+                              ),
+                            ),
+                          ]),
+                        )),
                     SizedBox(
                         width: MediaQuery.of(context).size.width,
                         child: Padding(

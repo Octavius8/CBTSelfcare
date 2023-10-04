@@ -117,6 +117,41 @@ class SqliteDatabase {
     return true;
   }
 
+  Future<String> getConfig(String configname) async {
+    String response = "";
+    List<Map> data =
+        await query("Select * from config where config_name='$configname'");
+    if (data.length != 0) {
+      response = data[0]['config_value'];
+    } else {
+      response = "";
+    }
+    return response;
+  }
+
+  Future<bool> setConfig(String configname, String configvalue) async {
+    try {
+      var value = await query(
+          "update config set config_value='$configvalue' where config_name='$configname';");
+      Log.debug(
+          "SqliteDatabase | setConfig",
+          "query is :" +
+              "update config set config_value='$configvalue' where config_name='$configname';");
+      Log.debug("SqliteDatabase | setConfig", "Successfully updated hehe");
+      String temp = await getConfig(configname);
+      if (configvalue != temp) {
+        //Not in DB INsert
+        await query(
+            "insert into config(config_name,config_value) values('$configname','$configvalue');");
+      }
+    } catch (e) {
+      Log.error("SqliteDatabase | setConfig",
+          "Something went wrong updating config. " + e.toString());
+    }
+
+    return true;
+  }
+
   Future<bool> disconnect() async {
     await this.database.close();
     return true;

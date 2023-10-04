@@ -16,4 +16,7 @@ class APIConfigs {
   // Play Store Link
   static const playStoreLink =
       'https://play.google.com/store/apps/details?id=com.ovidware.cbtselfcare';
+
+  static const shareLink =
+      "Heres an app I think you  may find useful: https://cbt.ovidware.com/share";
 }

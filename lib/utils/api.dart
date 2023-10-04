@@ -6,6 +6,7 @@ import "../config/api_configs.dart";
 import 'dart:convert';
 import 'package:device_info_plus/device_info_plus.dart';
 import "../utils/encryption.dart";
+import 'package:unique_identifier/unique_identifier.dart';
 
 class Api {
   Future<String?> postRequest({required String method, String? data}) async {
@@ -33,9 +34,12 @@ class Api {
 
   Future<bool> logActivity(String action) async {
     try {
-      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      String uid = androidInfo.serialNumber + "_" + androidInfo.id;
+      String uid = "";
+      try {
+        uid = await UniqueIdentifier.serial ?? "";
+      } catch (e) {
+        uid = 'Failed to get Unique Identifier.' + e.toString();
+      }
       Log.debug('Main | initialization()', 'Unique ID is  $uid');
       uid += "|" + action;
 

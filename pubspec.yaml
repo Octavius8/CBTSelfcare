@@ -42,6 +42,10 @@ dependencies:
   shake: ^2.2.0
   google_mobile_ads: ^2.0.0
   package_info_plus: ^4.1.0
+  flutter_local_notifications: ^15.1.1
+  android_alarm_manager_plus: ^3.0.2
+  unique_identifier: ^0.3.0
+  share_plus: ^7.1.0
 
 dev_dependencies:
   flutter_test:
