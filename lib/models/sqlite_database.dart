@@ -37,6 +37,8 @@ class SqliteDatabase {
             'CREATE TABLE prompt_answers (prompt_responses_id INTEGER PRIMARY KEY, prompt_id INTEGER,prompt_name TEXT, version_number TEXT, description TEXT,extra_data1 TEXT, extra_data2 TEXT,extra_data3 TEXT, extra_data4 TEXT,date_created DATETIME DEFAULT CURRENT_TIMESTAMP)');
         await db.execute(
             'CREATE TABLE config (prompt_id INTEGER PRIMARY KEY, config_name TEXT, config_value TEXT, date_created DATETIME DEFAULT CURRENT_TIMESTAMP)');
+
+        await setConfig("LOGINS", "0");
       });
     } catch (ex) {
       Log.error("SqliteDatabase | Connect()",

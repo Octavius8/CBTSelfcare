@@ -351,8 +351,13 @@ class _MyHomePageState extends State<MyHomePage> {
     SqliteDatabase db = new SqliteDatabase();
     await db.connect(); //reset: true);
     await db.serverSync(uid);
-    int newCount = int.parse(await db.getConfig("LOGINS")) + 1;
-    Log.debug("Main Login Count ", "New Count is " + newCount.toString());
+    int newCount = 0;
+    try {
+      newCount = int.parse(await db.getConfig("LOGINS")) + 1;
+    } catch (e) {
+      newCount = 1;
+      Log.debug("Main Login Count ", "New Count is " + newCount.toString());
+    }
     await db.setConfig("LOGINS", newCount.toString());
     await db.disconnect();
     checkAppVersion();

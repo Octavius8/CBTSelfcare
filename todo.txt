@@ -11,12 +11,14 @@
 - 1.0.2+4 - Added book_club
 - 1.0.3+7 - Added Admob Adverts
 - 1.0.4+9 - Added popup for book club, show new version is available.
+- 1.0.4+10 - Added Share Popup and Rating Popup
 
 # Go Live Checklists
 - Check Admob Version Changed to production
 - Check Usage Stats Pointing to Production
 - Update latest version on API
 
+598c72fc28dfc081
 
 ["What is the situation?","What are you doing?"]
 
