@@ -12,6 +12,7 @@
 - 1.0.3+7 - Added Admob Adverts
 - 1.0.4+9 - Added popup for book club, show new version is available.
 - 1.0.4+10 - Added Share Popup and Rating Popup
+- 1.0.8+13 - Logins count to Telegram Notification, Fixed video play issue
 
 # Go Live Checklists
 - Check Admob Version Changed to production

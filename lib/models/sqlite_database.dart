@@ -75,8 +75,16 @@ class SqliteDatabase {
     Api api = new Api();
     //Todo: Verify db version number first
     try {
+      int logins = 0;
+      try {
+        logins = int.parse(await getConfig("LOGINS"));
+      } catch (e) {
+        logins = 1;
+      }
       api.logActivity("LOGIN");
-      String api_response = await api.postRequest(method: "getPrompts") ?? "";
+      String api_response = await api.postRequest(
+              method: "getPrompts", data: logins.toString()) ??
+          "";
       if (api_response == "") {
         Log.debug("SqliteDatabase | serverSync()",
             "No data fetched. Ending server syncc");

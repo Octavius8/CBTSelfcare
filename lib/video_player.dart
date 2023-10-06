@@ -21,6 +21,7 @@ class _VideoAppState extends State<VideoApp> {
   double _trackerPosition = 0;
   Prompt? previous_lecture_prompt;
   Prompt? next_lecture_prompt;
+  bool _errorLoadingVideo = false;
 
   @override
   void initState() {
@@ -28,23 +29,47 @@ class _VideoAppState extends State<VideoApp> {
     this.title = widget.prompt.name;
     this.description = widget.prompt.description;
     getLectures();
-    _controller = VideoPlayerController.network(widget.prompt.extra_data1)
-      ..initialize().then((_) {
-        _controller.addListener(() {
-          //custom Listner
-          setState(() {
-            if (!_controller.value.isPlaying &&
-                _controller.value.isInitialized &&
-                (_controller.value.duration == _controller.value.position)) {
-              Log.debug("VideoPlayer | videoListener",
-                  "Reached end of file. Update to read");
-              //checking the duration and position every time
+    Log.debug("Video Player | initState",
+        "Video being played is: " + widget.prompt.name);
+    Log.debug("Video Player | initState",
+        "Video URL is: " + widget.prompt.extra_data1);
+    _controller =
+        //VideoPlayerController.networkUrl(Uri.parse(widget.prompt.extra_data1))
+        VideoPlayerController.networkUrl(
+            Uri.parse("https://cbt.ovidware.com/files/1-getting-started.mp4"))
+          ..initialize().then((_) {
+            _controller.addListener(() {
+              //custom Listner
+              setState(() {
+                if (!_controller.value.isPlaying &&
+                    _controller.value.isInitialized &&
+                    (_controller.value.duration ==
+                        _controller.value.position)) {
+                  Log.debug("VideoPlayer | videoListener",
+                      "Reached end of file. Update to read");
+                  //checking the duration and position every time
+                  setState(() {});
+                }
+              });
               setState(() {});
-            }
+            });
           });
-          setState(() {});
-        });
-      });
+
+    _controller.addListener(() {
+      Log.debug(
+          'VideoPlayer | initState', 'adding listener to video controller...');
+      if (_controller.value.isBuffering) {
+        Log.debug('VideoPlayer | initState', 'buffering...');
+        _errorLoadingVideo = false;
+      } else if (_controller.value.hasError) {
+        Log.debug('VideoPlayer | initState', 'error occurred: ');
+        _errorLoadingVideo = true;
+      } else if (_controller.value.position == _controller.value.duration) {
+        Log.debug('VideoPlayer | initState', 'completed');
+        _errorLoadingVideo = false;
+      }
+      setState(() {});
+    });
   }
 
   void getLectures() async {
@@ -67,10 +92,11 @@ class _VideoAppState extends State<VideoApp> {
       Log.debug("VideoPlayer | _loadVideo()",
           "New lecture is: " + widget.prompt.name);
       setState(() {});
-      _controller = VideoPlayerController.network(widget.prompt.extra_data1)
-        ..initialize().then((_) {
-          setState(() {});
-        });
+      _controller =
+          VideoPlayerController.networkUrl(Uri.parse(widget.prompt.extra_data1))
+            ..initialize().then((_) {
+              setState(() {});
+            });
     }
   }
 
@@ -111,17 +137,30 @@ class _VideoAppState extends State<VideoApp> {
                         :
 
                         //Loading Screen
-                        Container(
-                            height: 180,
-                            width: MediaQuery.of(context).size.width,
-                            child: Center(
-                              child: SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                    color: ThemeConfigs.color_primary),
-                              ),
-                            )),
+                        _errorLoadingVideo
+                            ? Container(
+                                height: 180,
+                                width: MediaQuery.of(context).size.width,
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.cancel_sharp,
+                                          color: Colors.red),
+                                      Text("Something went wrong.")
+                                    ]))
+                            : Container(
+                                height: 180,
+                                width: MediaQuery.of(context).size.width,
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                        color: ThemeConfigs.color_primary),
+                                  ),
+                                )),
 
                     //Tracker
                     Container(
