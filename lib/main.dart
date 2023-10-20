@@ -7,6 +7,7 @@ import 'video_library_page .dart';
 import 'progress_tracker_page.dart';
 import 'mental_hygiene_page.dart';
 import 'book_club_page.dart';
+import 'mood_tracker_page.dart';
 import 'models/mental_hygiene.dart';
 import 'models/lecture.dart';
 import 'models/prompt.dart';
@@ -395,6 +396,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void _loadMoodTracker() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MoodTrackerPage()),
+    );
+  }
+
   void _loadProgressTracker() {
     Navigator.push(
       context,
@@ -682,9 +690,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                                           Api api = new Api();
                                                           api.logActivity(
                                                               "MYTASKS_TRACKER_CLICK");
-                                                          _loadConversation(
+                                                          _loadMoodTracker();
+                                                          /*_loadConversation(
                                                               SystemConstants
-                                                                  .conversation_tag_mood_tracker);
+                                                                  .conversation_tag_mood_tracker);*/
                                                         }),
                                                   ]),
                                                 ),
@@ -823,8 +832,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         onTap: () {
                                           Api api = new Api();
                                           api.logActivity("MOODTRACKER_CLICK");
-                                          _loadConversation(SystemConstants
-                                              .conversation_tag_mood_tracker);
+                                          _loadMoodTracker();
                                         }),
                                   ),
                                   Expanded(

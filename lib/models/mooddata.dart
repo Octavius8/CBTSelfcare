@@ -1,11 +1,11 @@
 class MoodData {
-  MoodData(this.year, this.sales);
+  MoodData(this.date, this.value);
 
-  final String year;
-  final double sales;
+  final String date;
+  final double value;
 
   @override
   String toString() {
-    return year + "-" + sales.toString();
+    return date + "-" + value.toString();
   }
 }

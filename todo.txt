@@ -3,6 +3,8 @@
 - Fast forward and rewind
 - Finish googleplay console listing
 - update link to playstore on website
+- molly: Make it look less Demo version
+- molly: change icons to be more descriptive
 
 # Versions
 - 1(1.0.0) - Initial release
@@ -13,10 +15,10 @@
 - 1.0.4+9 - Added popup for book club, show new version is available.
 - 1.0.4+10 - Added Share Popup and Rating Popup
 - 1.0.8+13 - Logins count to Telegram Notification, Fixed video play issue
+- 1.0.9+14 - Simplified Mood Tracker
 
 # Go Live Checklists
-- Check Admob Version Changed to production
-- Check Usage Stats Pointing to Production
+- Check Admob Version Changed to production (APIConfigs)
 - Update latest version on API
 
 598c72fc28dfc081

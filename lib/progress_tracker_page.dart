@@ -9,8 +9,10 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'utils/api.dart';
 import 'conversation_page.dart';
+import 'mood_tracker_page.dart';
 import 'config/system_constants.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import "models/sqlite_database.dart";
 
 class ProgressTrackerPage extends StatefulWidget {
   @override
@@ -35,23 +37,29 @@ class ProgressTrackerPageState extends State<ProgressTrackerPage> {
   }
 
   void getMoodData() async {
-    Conversation conv = new Conversation();
-    map = await conv.getMoodData();
-
-    map.forEach((key, value) {
-      List<MoodData> temp = value as List<MoodData>;
-      print("Temp is" + temp[0].toString());
-      lineSeriesList.add(LineSeries<MoodData, String>(
-          dataSource: temp,
-          xValueMapper: (MoodData mood, _) {
-            var parsedDate = DateTime.parse(mood.year);
-            return DateFormat.MMMd().format(parsedDate);
-          },
-          yValueMapper: (MoodData mood, _) => mood.sales,
-          name: key,
-          // Enable data label
-          dataLabelSettings: DataLabelSettings(isVisible: true)));
+    SqliteDatabase db = new SqliteDatabase();
+    String sql = "select mood_value,date_created from mood_data limit " +
+        SystemConstants.mood_tracker_limit;
+    await db.connect();
+    List<Map> list = await db.query(sql);
+    lineSeriesList.clear();
+    List<MoodData> temp = [];
+    list.forEach((entry) {
+      temp.add(new MoodData(
+          entry['date_created'], double.parse(entry['mood_value'].toString())));
     });
+
+    print("Temp is" + temp[0].toString());
+    lineSeriesList.add(LineSeries<MoodData, String>(
+        dataSource: temp,
+        xValueMapper: (MoodData mood, _) {
+          var parsedDate = DateTime.parse(mood.date);
+          return DateFormat.MMMd().format(parsedDate);
+        },
+        yValueMapper: (MoodData mood, _) => mood.value,
+        name: "Mood",
+        // Enable data label
+        dataLabelSettings: DataLabelSettings(isVisible: true)));
 
     print("Length is:" + lineSeriesList.length.toString());
     setState(() {});
@@ -97,8 +105,7 @@ class ProgressTrackerPageState extends State<ProgressTrackerPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ConversationPage(
-                                SystemConstants.conversation_tag_mood_tracker)),
+                            builder: (context) => MoodTrackerPage()),
                       ).then((value) {
                         getMoodData();
                       });
@@ -122,6 +129,30 @@ class ProgressTrackerPageState extends State<ProgressTrackerPage> {
               position: LegendPosition.bottom,
             ),
             primaryXAxis: CategoryAxis(),
+            primaryYAxis:
+                NumericAxis(axisLabelFormatter: (AxisLabelRenderDetails args) {
+              String response = "";
+              if (args.text == "20") {
+                response = "Angry";
+              }
+
+              if (args.text == "40") {
+                response = "Sad";
+              }
+
+              if (args.text == "60") {
+                response = "Meh";
+              }
+
+              if (args.text == "80") {
+                response = "Happy";
+              }
+
+              if (args.text == "100") {
+                response = "Ecstatic";
+              }
+              return ChartAxisLabel(response, TextStyle());
+            }),
 
             // Chart title
             title: ChartTitle(text: 'Your Progress'),
